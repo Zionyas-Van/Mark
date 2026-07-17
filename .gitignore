@@ -1,0 +1,9 @@
+dist/
+node_modules/
+package-lock.json
+.DS_Store
+Thumbs.db
+*.tmp
+.vscode/
+.idea/
+MarkNotes/ 

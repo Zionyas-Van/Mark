@@ -1,0 +1,452 @@
+/* =========================================
+   Mark Editor - Dark Mode (WinUI Style)
+   ========================================= */
+
+:root {
+    /* --- 1. 颜色系统 (Color System) --- */
+    --winui-bg-base: #202020;          /* 深色 Mica 基础色 */
+    --winui-surface: #2c2c2c;          /* 卡片/面板表面 (比背景稍亮) */
+    --winui-border-light: #3e3e3e;     /* 深色边框 */
+    --winui-border-focus: #4cc2ff;     /* 聚焦边框 (亮蓝) */
+    
+    --winui-text-primary: #ffffff;     /* 主要文字 (白色) */
+    --winui-text-secondary: #a0a0a0;   /* 次要文字 (灰色) */
+    --winui-text-disabled: #606060;    /* 禁用文字 */
+    
+    --winui-accent: #4cc2ff;           /* Windows 11 深色模式accent */
+    --winui-accent-hover: #3ab0ef;
+    --winui-accent-light: rgba(76, 194, 255, 0.15); /* 选中背景 */
+    
+    --winui-danger: #ff6b6b;
+    --winui-success: #6ccb5f;
+
+    /* --- 2. 材质与阴影 (Materials & Elevation) --- */
+    --winui-mica: rgba(32, 32, 32, 0.85);
+    --winui-acrylic: rgba(44, 44, 44, 0.7);
+    --winui-shadow-card: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --winui-shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.4);
+    --winui-blur: blur(20px) saturate(120%);
+
+    /* --- 3. 几何与间距 (Geometry & Spacing) --- */
+    --winui-radius-sm: 4px;
+    --winui-radius-md: 8px;
+    --winui-radius-lg: 12px;
+    
+    --winui-spacing-xs: 4px;
+    --winui-spacing-sm: 8px;
+    --winui-spacing-md: 16px;
+    --winui-spacing-lg: 24px;
+
+    /* --- 4. 动画 (Animation) --- */
+    --winui-transition: all 0.15s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+/* =========================================
+   1. 全局重置与基础 (Global Reset)
+   ========================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+body, html {
+    height: 100%; width: 100%;
+    font-family: "Segoe UI Variable", "Segoe UI", "Microsoft YaHei", sans-serif;
+    background-color: var(--winui-bg-base);
+    color: var(--winui-text-primary);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 滚动条美化 (Dark Style) */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { 
+    background-color: rgba(255, 255, 255, 0.2); 
+    border-radius: 10px; 
+    border: 3px solid transparent; 
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.4); }
+
+/* 防选中设置 */
+body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
+    user-select: none; -webkit-user-select: none;
+}
+#editor-container, #preview, .CodeMirror, .winui-input {
+    user-select: text; -webkit-user-select: text;
+}
+
+/* =========================================
+   2. 顶部工具栏 (Toolbar - Mica Effect)
+   ========================================= */
+#toolbar {
+    height: 48px;
+    background-color: var(--winui-mica);
+    backdrop-filter: var(--winui-blur);
+    -webkit-backdrop-filter: var(--winui-blur);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex; align-items: center;
+    padding: 0 var(--winui-spacing-md);
+    gap: var(--winui-spacing-sm);
+    flex-shrink: 0; z-index: 100;
+    min-width: 0; 
+}
+
+.toolbar-section { 
+    display: flex; 
+    align-items: center; 
+    height: 100%; 
+    min-width: 0; 
+}
+
+.toolbar-left, .toolbar-right { 
+    gap: 4px; 
+    flex-shrink: 0; 
+}
+
+.toolbar-center { 
+    flex: 1; 
+    justify-content: center; 
+    overflow: hidden; 
+    min-width: 0;
+}
+
+/* 按钮通用样式 */
+.menu-btn, .tool-btn {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: var(--winui-radius-sm);
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; 
+    color: var(--winui-text-primary); 
+    transition: var(--winui-transition);
+    border: 1px solid transparent;
+    background: transparent;
+    height: 32px;
+    flex-shrink: 0; 
+}
+
+/* 强制所有工具栏内的 SVG 变为白色/亮色，确保在深色背景下可见 */
+.tool-btn svg, 
+.menu-btn svg {
+    stroke: #ffffff !important;      
+    fill: none !important;          
+    display: block;              
+    width: 16px;                    
+    height: 16px;                  
+    min-width: 16px;                 
+    min-height: 16px;             
+}
+
+/* 悬停效果 */
+.menu-btn:hover, .tool-btn:hover { 
+    background-color: rgba(255, 255, 255, 0.08); 
+}
+.menu-btn:active, .tool-btn:active { 
+    background-color: rgba(255, 255, 255, 0.12); 
+    transform: scale(0.98);
+}
+
+/* 文件名显示 */
+#current-filename-display {
+    font-weight: 600; color: var(--winui-accent);
+    max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* 富文本工具条容器 */
+.rich-toolbar {
+    display: flex; align-items: center; gap: 2px;
+    padding: 2px; 
+    overflow-x: auto; 
+    overflow-y: hidden;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--winui-border-light);
+    border-radius: var(--winui-radius-md);
+    max-width: 100%; 
+    min-width: 0;    
+}
+.rich-toolbar::-webkit-scrollbar { height: 0; } 
+
+.toolbar-divider { width: 1px; height: 16px; background: var(--winui-border-light); margin: 0 6px; flex-shrink: 0; }
+
+/* =========================================
+   3. 主工作区 (Main Workspace)
+   ========================================= */
+#workspace { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+
+/* --- 左侧边栏 (Sidebar) --- */
+#sidebar {
+    width: 260px;
+    background: var(--winui-surface);
+    border-right: 1px solid var(--winui-border-light);
+    display: flex; flex-direction: column;
+    flex-shrink: 0; 
+}
+
+#path-nav {
+    padding: var(--winui-spacing-sm) var(--winui-spacing-md);
+    font-size: 12px; color: var(--winui-text-secondary);
+    border-bottom: 1px solid var(--winui-border-light);
+    background: rgba(255, 255, 255, 0.02);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.path-segment { cursor: pointer; padding: 2px 4px; border-radius: 3px; }
+.path-segment:hover { background: rgba(255, 255, 255, 0.05); color: var(--winui-text-primary); }
+
+#file-list { flex: 1; overflow-y: auto; list-style: none; padding: 8px; }
+
+.file-item {
+    padding: 8px 12px; cursor: pointer;
+    border-radius: var(--winui-radius-sm); font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 2px; color: var(--winui-text-primary);
+    transition: background 0.1s;
+}
+.file-item:hover { background: rgba(255, 255, 255, 0.06); }
+.file-item.active { 
+    background: var(--winui-accent-light); 
+    color: var(--winui-accent); 
+    font-weight: 500; 
+}
+
+/* --- 右侧编辑与预览区 --- */
+#editor-area { flex: 1; display: flex; position: relative; background: var(--winui-surface); min-width: 0; }
+
+.editor-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    background: var(--winui-bg-base); z-index: 10; color: var(--winui-text-secondary);
+}
+
+#editor-container { width: 50%; height: 100%; border-right: 1px solid var(--winui-border-light); min-width: 0; }
+.CodeMirror {
+    height: 100%; font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 14px; line-height: 1.6; background: transparent; color: var(--winui-text-primary);
+}
+.CodeMirror-gutters { background: transparent; border-right: 1px solid var(--winui-border-light); }
+.CodeMirror-cursor { border-left: 1px solid var(--winui-text-primary); }
+.CodeMirror-selected { background: var(--winui-accent-light) !important; }
+
+#preview {
+    width: 50%; height: 100%; overflow-y: auto;
+    padding: 40px 60px; background: var(--winui-surface);
+    word-wrap: break-word; min-width: 0;
+}
+
+/* =========================================
+   4. Markdown 预览 (Dark Mode Optimized)
+   ========================================= */
+#preview h1 { font-size: 28px; font-weight: 600; margin-bottom: 16px; color: var(--winui-text-primary); }
+#preview h2 { font-size: 20px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid var(--winui-border-light); padding-bottom: 4px; }
+#preview h3 { font-size: 16px; font-weight: 600; margin-top: 20px; margin-bottom: 8px; }
+#preview p { line-height: 1.8; color: var(--winui-text-primary); margin-bottom: 16px; font-size: 15px; }
+#preview a { color: var(--winui-accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border 0.2s; }
+#preview a:hover { border-bottom-color: var(--winui-accent); }
+
+#preview blockquote {
+    border-left: 4px solid var(--winui-accent);
+    padding: 8px 16px; margin: 16px 0;
+    background: var(--winui-accent-light);
+    color: var(--winui-text-secondary);
+    border-radius: 0 var(--winui-radius-sm) var(--winui-radius-sm) 0;
+}
+
+#preview code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px; border-radius: 4px;
+    font-family: 'Cascadia Code', monospace; font-size: 0.9em;
+    color: #ff79c6;
+}
+
+#preview pre {
+    background: #1e1e1e; color: #d4d4d4;
+    padding: 16px; border-radius: var(--winui-radius-md);
+    overflow-x: auto; margin: 16px 0;
+    box-shadow: var(--winui-shadow-card);
+    border: 1px solid var(--winui-border-light);
+}
+#preview pre code { background: none; padding: 0; color: inherit; }
+
+#preview table {
+    border-collapse: collapse; width: 100%; margin: 16px 0;
+    font-size: 14px; border: 1px solid var(--winui-border-light);
+    border-radius: var(--winui-radius-sm); overflow: hidden;
+}
+#preview th { background: rgba(255, 255, 255, 0.05); font-weight: 600; text-align: left; }
+#preview th, #preview td { border: 1px solid var(--winui-border-light); padding: 10px 14px; }
+#preview tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+#preview img {
+    max-width: 100%; border-radius: var(--winui-radius-md);
+    box-shadow: var(--winui-shadow-card); margin: 20px 0;
+}
+
+/* =========================================
+   5. 模态框与菜单 (Modals & Flyouts)
+   ========================================= */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: none; justify-content: center; align-items: center;
+    z-index: 3000;
+}
+
+.modal-card {
+    background: var(--winui-surface); padding: 24px;
+    border-radius: var(--winui-radius-lg);
+    box-shadow: var(--winui-shadow-flyout);
+    width: 420px; max-width: 90%;
+    border: 1px solid var(--winui-border-light);
+    animation: modalPop 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+    color: var(--winui-text-primary);
+}
+@keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.winui-input {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid #555; border-radius: var(--winui-radius-sm);
+    font-size: 13px; margin-bottom: 16px;
+    transition: border 0.2s;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--winui-text-primary);
+}
+.winui-input:focus { border-color: var(--winui-accent); border-width: 2px; padding: 7px 11px; }
+
+.winui-btn {
+    padding: 6px 20px; border-radius: var(--winui-radius-sm);
+    border: 1px solid transparent; cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    transition: var(--winui-transition);
+}
+.winui-btn.primary { background: var(--winui-accent); color: #000; }
+.winui-btn.primary:hover { background: var(--winui-accent-hover); }
+.winui-btn.secondary { background: rgba(255, 255, 255, 0.08); color: var(--winui-text-primary); }
+.winui-btn.secondary:hover { background: rgba(255, 255, 255, 0.12); }
+
+/* 弹窗按钮水平排列 */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* 下拉菜单与右键菜单 */
+.dropdown-menu, .context-menu {
+    position: absolute; 
+    background: rgba(44, 44, 44, 0.95); 
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--winui-border-light);
+    box-shadow: var(--winui-shadow-flyout);
+    border-radius: var(--winui-radius-md); 
+    padding: 4px; min-width: 160px; z-index: 1000; display: none;
+    animation: fadeIn 0.15s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+.dropdown-item, .context-item {
+    padding: 8px 12px; cursor: pointer; font-size: 13px;
+    border-radius: var(--winui-radius-sm);
+    display: flex; align-items: center; gap: 8px;
+    color: var(--winui-text-primary); transition: background 0.1s;
+}
+.dropdown-item:hover, .context-item:hover { background-color: rgba(255, 255, 255, 0.08); }
+.dropdown-divider { height: 1px; background: var(--winui-border-light); margin: 4px 8px; }
+
+/* =========================================
+   6. 状态栏与提示 (Status Bar & Toast)
+   ========================================= */
+#status-bar {
+    height: 28px; 
+    background-color: var(--winui-mica);
+    backdrop-filter: var(--winui-blur);
+    border-top: 1px solid var(--winui-border-light);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; color: var(--winui-text-secondary);
+    flex-shrink: 0;
+}
+
+#toast-container {
+    position: fixed; bottom: 20px; right: 20px;
+    z-index: 3000; display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+    background: #444; color: white;
+    padding: 10px 20px; border-radius: var(--winui-radius-md);
+    font-size: 13px; box-shadow: var(--winui-shadow-flyout);
+    animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* =========================================
+   7. 其他组件 (Trash, Move, Drag)
+   ========================================= */
+#trash-file-list, #move-file-list {
+    list-style: none; padding: 0; margin: 10px 0;
+    max-height: 300px; overflow-y: auto;
+    border: 1px solid var(--winui-border-light); border-radius: var(--winui-radius-sm);
+}
+#trash-file-list li, #move-file-list li {
+    padding: 8px 12px; border-bottom: 1px solid var(--winui-border-light);
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--winui-text-primary);
+}
+#trash-file-list li:hover, #move-file-list li:hover { background-color: rgba(255, 255, 255, 0.06); }
+#trash-file-list li.trash-selected, #move-file-list li.selected { 
+    background-color: var(--winui-accent-light); color: var(--winui-accent); 
+}
+
+#drag-overlay {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background:rgba(32, 32, 32, 0.8); backdrop-filter: blur(10px); 
+    z-index:9999; justify-content:center; align-items:center; flex-direction:column; 
+    color:var(--winui-accent); border: 4px dashed var(--winui-accent); box-sizing: border-box;
+}
+
+/* =========================================
+   8. 侧边栏图标颜色定制 (Sidebar Icons)
+   ========================================= */
+
+/* 文件夹：黄色 */
+.folder-item .icon-svg svg {
+    stroke: #ffb900 !important;
+}
+.folder-item {
+    color: var(--winui-text-primary); 
+}
+
+/* 快捷方式：亮蓝色 */
+.link-item .icon-svg svg {
+    stroke: #4cc2ff !important; 
+}
+.link-item {
+    color: var(--winui-text-primary);
+}
+
+/* 普通 MD 文章：浅蓝色 */
+.file-item:not(.folder-item):not(.link-item):not(.image-item) .icon-svg svg {
+    stroke: #60cdff !important;
+}
+.file-item:not(.folder-item):not(.link-item):not(.image-item) {
+    color: var(--winui-text-primary);
+}
+
+/* 图片文件：粉色 */
+.image-item .icon-svg svg {
+    stroke: #e05688 !important; 
+} 
+
+/* 设置窗口内容滚动支持 */
+.modal-body-scrollable {
+    scrollbar-width: thin;
+}
+.modal-body-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-body-scrollable::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
