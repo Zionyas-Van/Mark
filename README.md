@@ -1,10 +1,11 @@
-﻿![输入图片说明](https://raw.githubusercontent.com/Zionyas-Van/stackedit-app-data/master/imgs/2026-07-17/k33Zm7Ad5gtDC5Qp.png)
+﻿![输入图片说明](https://raw.githubusercontent.com/Zionyas-Van/stackedit-app-data/master/imgs/2026-07-17/G4SEX95GdJ9ZJjo0.ico)
 # Mark 
 是一款轻量化的 Markdown 编辑器。
-
 is lightweight Markdown editor.
-![主界面](https://raw.githubusercontent.com/Zionyas-Van/stackedit-app-data/master/imgs/2026-07-17/MvF6iD7oyHXXEo13.png)
+![输入图片说明](https://raw.githubusercontent.com/Zionyas-Van/stackedit-app-data/master/imgs/2026-07-17/DzOUwp9tyq8JGE8T.png)
 
+现在已经支持绑定图床功能，使用 Mark 让你可以在一个窗口完成上传图床与拉取链接的操作：
+![输入图片说明](https://raw.githubusercontent.com/Zionyas-Van/stackedit-app-data/master/imgs/2026-07-17/r2yONFS1uYDrGnHc.png)
 ### Mark主界面
 Mark 的主界面主要分为顶栏 、导航栏、写作区以及预览区。
 

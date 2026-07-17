@@ -560,3 +560,8 @@ INFO 2026-07-17 16:53:27,738 Reloading the application... D:\a\neutralinojs\neut
 ERROR 2026-07-17 16:53:30,936 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
 INFO 2026-07-17 16:56:54,586 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
 ERROR 2026-07-17 16:56:57,259 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 17:06:53,310 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 17:07:02,469 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 17:07:02,475 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 17:07:32,074 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 17:07:36,426 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
