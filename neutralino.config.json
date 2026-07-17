@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
   "applicationId": "com.zionyasvan.mark",
-  "version": "0.1.20260716",
+  "version": "1.0.20260717",
   "defaultMode": "window",
   "port": 0,
   "documentRoot": "/resources/",
@@ -17,7 +17,8 @@
     "app.*",
     "os.*",
     "filesystem.*",
-    "debug.*"
+    "debug.*",
+    "clipboard.*"
   ],
   "globalVariables": {},
   "modes": {
@@ -31,7 +32,7 @@
       "fullScreen": false,
       "alwaysOnTop": false,
       "icon": "/resources/icons/Mark.ico",
-      "enableInspector": false,
+      "enableInspector": true,
       "borderless": false,
       "maximize": false,
       "hidden": false,

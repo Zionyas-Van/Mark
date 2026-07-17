@@ -1,6 +1,72 @@
-/* =========================================
-   Mark Editor - Dark Mode (WinUI Style)
-   ========================================= */
+/* 深色模式 */
+
+/* 1. 强制编辑器容器背景为深色 */
+.dark-mode #editor-container,
+.dark-mode .CodeMirror {
+    background-color: #2c2c2c !important;
+    color: #d4d4d4 !important; /* 浅灰文字，确保可见 */
+}
+
+/* 2. 强制编辑器内部所有文本节点的颜色 */
+.dark-mode .CodeMirror-code,
+.dark-mode .CodeMirror-line,
+.dark-mode .CodeMirror pre,
+.dark-mode .CodeMirror span {
+    color: #d4d4d4 !important;
+}
+
+/* 3. 强制行号区域可见 */
+.dark-mode .CodeMirror-gutters,
+.dark-mode .CodeMirror-linenumber {
+    background-color: #252525 !important;
+    color: #858585 !important;
+    border-right: 1px solid #3e3e3e !important;
+}
+
+/* 4. 强制光标可见 */
+.dark-mode .CodeMirror-cursor {
+    border-left-color: #ffffff !important;
+}
+
+/* 5. 强制选中背景可见 */
+.dark-mode .CodeMirror-selected {
+    background-color: rgba(76, 194, 255, 0.2) !important;
+}
+
+/* 6. 覆盖 JS 动态添加的语义化类名，确保它们在深色背景下依然清晰 */
+.dark-mode .CodeMirror-line .cm-header-1,
+.dark-mode .CodeMirror-line .cm-header-2,
+.dark-mode .CodeMirror-line .cm-header-3,
+.dark-mode .CodeMirror-line .cm-header-4,
+.dark-mode .CodeMirror-line .cm-header-5,
+.dark-mode .CodeMirror-line .cm-header-6 {
+    color: #9cdcfe !important; /* 亮蓝 */
+}
+
+.dark-mode .CodeMirror-line .cm-strong {
+    color: #ffffff !important; /* 纯白 */
+}
+
+.dark-mode .CodeMirror-line .cm-em {
+    color: #cccccc !important; /* 浅灰 */
+}
+
+.dark-mode .CodeMirror-line .cm-inline-code {
+    color: #ce9178 !important; /* 橙色 */
+    background: rgba(206, 145, 120, 0.1) !important;
+}
+
+.dark-mode .CodeMirror-line .cm-fenced-code {
+    color: #b5cea8 !important; /* 绿色 */
+}
+
+.dark-mode .CodeMirror-line .cm-link-text {
+    color: #9cdcfe !important;
+}
+
+.dark-mode .CodeMirror-line .cm-image-link {
+    color: #c586c0 !important; /* 紫色 */
+}
 
 :root {
     /* --- 1. 颜色系统 (Color System) --- */
@@ -171,36 +237,57 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
 .toolbar-divider { width: 1px; height: 16px; background: var(--winui-border-light); margin: 0 6px; flex-shrink: 0; }
 
 /* =========================================
-   3. 主工作区 (Main Workspace)
+   3. 主工作区 (Main Workspace) & Resizers
    ========================================= */
-#workspace { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+#workspace { 
+    flex: 1; 
+    display: flex; 
+    overflow: hidden; 
+    min-height: 0; 
+}
 
 /* --- 左侧边栏 (Sidebar) --- */
 #sidebar {
-    width: 260px;
-    background: var(--winui-surface);
+    width: 260px; 
+    min-width: 180px; 
+    max-width: 50%; 
+    background: var(--winui-surface); /* 深色表面色 */
     border-right: 1px solid var(--winui-border-light);
-    display: flex; flex-direction: column;
+    display: flex; 
+    flex-direction: column;
     flex-shrink: 0; 
 }
 
 #path-nav {
     padding: var(--winui-spacing-sm) var(--winui-spacing-md);
-    font-size: 12px; color: var(--winui-text-secondary);
+    font-size: 12px; 
+    color: var(--winui-text-secondary);
     border-bottom: 1px solid var(--winui-border-light);
-    background: rgba(255, 255, 255, 0.02);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    background: rgba(255, 255, 255, 0.03); /* 深色模式下的极淡背景 */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    flex-shrink: 0; 
 }
-.path-segment { cursor: pointer; padding: 2px 4px; border-radius: 3px; }
-.path-segment:hover { background: rgba(255, 255, 255, 0.05); color: var(--winui-text-primary); }
 
-#file-list { flex: 1; overflow-y: auto; list-style: none; padding: 8px; }
+#file-list { 
+    flex: 1; 
+    overflow-y: auto; 
+    list-style: none; 
+    padding: 8px; 
+    margin: 0;
+}
 
 .file-item {
-    padding: 8px 12px; cursor: pointer;
-    border-radius: var(--winui-radius-sm); font-size: 13px;
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 2px; color: var(--winui-text-primary);
+    padding: 8px 12px; 
+    cursor: pointer;
+    border-radius: var(--winui-radius-sm); 
+    font-size: 13px;
+    display: flex; 
+    align-items: center; 
+    gap: 8px;
+    margin-bottom: 2px; 
+    color: var(--winui-text-primary); /* 深色模式下文字为白色 */
     transition: background 0.1s;
 }
 .file-item:hover { background: rgba(255, 255, 255, 0.06); }
@@ -210,8 +297,34 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
     font-weight: 500; 
 }
 
+/* --- 拖拽手柄 (Resizer) --- */
+.resizer {
+    width: 5px;
+    height: 100%;
+    background: transparent;
+    cursor: col-resize;
+    position: relative;
+    z-index: 10;
+    transition: background 0.2s;
+}
+.resizer:hover, .resizer.active {
+    background: rgba(76, 194, 255, 0.2); /* 深色模式下悬停显示亮蓝色 */
+}
+.resizer::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: -2px; right: -2px;
+}
+
 /* --- 右侧编辑与预览区 --- */
-#editor-area { flex: 1; display: flex; position: relative; background: var(--winui-surface); min-width: 0; }
+#editor-area { 
+    flex: 1; 
+    display: flex; 
+    position: relative; 
+    background: var(--winui-surface); 
+    min-width: 0; 
+    overflow: hidden;
+}
 
 .editor-overlay {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -220,19 +333,58 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
     background: var(--winui-bg-base); z-index: 10; color: var(--winui-text-secondary);
 }
 
-#editor-container { width: 50%; height: 100%; border-right: 1px solid var(--winui-border-light); min-width: 0; }
+#editor-container { 
+    width: 50%; 
+    min-width: 200px; 
+    height: 100%; 
+    border-right: 1px solid var(--winui-border-light); 
+    overflow: hidden; 
+}
+
 .CodeMirror {
-    height: 100%; font-family: 'Cascadia Code', 'Consolas', monospace;
-    font-size: 14px; line-height: 1.6; background: transparent; color: var(--winui-text-primary);
+    height: 100%; 
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 14px; 
+    line-height: 1.6; 
+    background: transparent;
 }
 .CodeMirror-gutters { background: transparent; border-right: 1px solid var(--winui-border-light); }
-.CodeMirror-cursor { border-left: 1px solid var(--winui-text-primary); }
-.CodeMirror-selected { background: var(--winui-accent-light) !important; }
+.CodeMirror-wrap pre { word-break: break-word; white-space: pre-wrap; }
 
 #preview {
-    width: 50%; height: 100%; overflow-y: auto;
-    padding: 40px 60px; background: var(--winui-surface);
-    word-wrap: break-word; min-width: 0;
+    flex: 1; 
+    min-width: 200px; 
+    height: 100%; 
+    overflow-y: auto;
+    padding: 40px 60px; 
+    background: var(--winui-surface);
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+    font-family: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei UI", "Segoe UI Variable", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+}
+
+#preview img {
+    max-width: 100%; 
+    height: auto;
+    border-radius: var(--winui-radius-md);
+    box-shadow: var(--winui-shadow-card); 
+    margin: 20px 0;
+    display: block; 
+}
+
+#preview hr {
+    border: none;
+    border-top: 2px dashed #b0c4de;
+    margin: 28px 0;
+}
+
+
+#preview table {
+    display: block; 
+    width: 100%;
+    overflow-x: auto;
 }
 
 /* =========================================
@@ -247,27 +399,53 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
 
 #preview blockquote {
     border-left: 4px solid var(--winui-accent);
-    padding: 8px 16px; margin: 16px 0;
+    padding: 12px 20px; margin: 16px 0;
     background: var(--winui-accent-light);
     color: var(--winui-text-secondary);
     border-radius: 0 var(--winui-radius-sm) var(--winui-radius-sm) 0;
 }
 
+#preview blockquote ul,
+#preview blockquote ol {
+    padding-left: 24px;
+    margin: 8px 0;
+}
+
+#preview ul li::marker,
+#preview ol li::marker {
+    color: #60a5fa;
+    font-weight: 600;
+}
+
 #preview code {
-    background: rgba(255, 255, 255, 0.1);
+    background: #1a2a3a;                
     padding: 2px 6px; border-radius: 4px;
     font-family: 'Cascadia Code', monospace; font-size: 0.9em;
-    color: #ff79c6;
+    color: #7cc8f5;                    
 }
 
 #preview pre {
-    background: #1e1e1e; color: #d4d4d4;
+    background: #1a2a3a;              
+    color: #7cc8f5;                  
     padding: 16px; border-radius: var(--winui-radius-md);
     overflow-x: auto; margin: 16px 0;
     box-shadow: var(--winui-shadow-card);
-    border: 1px solid var(--winui-border-light);
+    border: 1px solid #2a4a6a;          
 }
-#preview pre code { background: none; padding: 0; color: inherit; }
+#preview pre code {
+    background: none; padding: 0;
+    color: #7cc8f5;                   
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+
+#preview hr {
+    border: none;
+    border-top: 2px dashed #3a5a7a;
+    margin: 28px 0;
+}
 
 #preview table {
     border-collapse: collapse; width: 100%; margin: 16px 0;
@@ -449,4 +627,295 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
 .modal-body-scrollable::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 3px;
+}
+
+/* =========================================
+   设置窗口新布局样式
+   ========================================= */
+
+/* 左侧导航项 */
+.setting-nav-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--winui-text-secondary);
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.setting-nav-item:hover {
+    background: rgba(0,0,0,0.05);
+    color: var(--winui-text-primary);
+}
+
+.setting-nav-item.active {
+    background: rgba(0,0,0,0.03);
+    color: var(--winui-accent);
+    border-left-color: var(--winui-accent);
+    font-weight: 600;
+}
+
+.setting-nav-item svg {
+    stroke: currentColor;
+}
+
+/* 胶囊开关 (Capsule Switch) */
+.capsule-switch-container {
+    display: flex;
+    align-items: center;
+}
+
+.capsule-checkbox {
+    display: none; /* 隐藏原生复选框 */
+}
+
+.capsule-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
+}
+
+.capsule-toggle {
+    width: 40px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 20px;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.capsule-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* 选中状态 */
+.capsule-checkbox:checked + .capsule-label .capsule-toggle {
+    background: var(--winui-accent);
+}
+
+.capsule-checkbox:checked + .capsule-label .capsule-toggle::after {
+    transform: translateX(20px);
+}
+
+.capsule-text {
+    font-size: 14px;
+    color: var(--winui-text-primary);
+}
+
+
+/* 1. 标题样式映射 */
+.CodeMirror-line .cm-header-1 { font-size: 28px; font-weight: 700; color: var(--winui-text-primary); }
+.CodeMirror-line .cm-header-2 { font-size: 22px; font-weight: 600; color: var(--winui-text-primary); border-bottom: 1px solid var(--winui-border-light); display: inline-block; width: 100%; }
+.CodeMirror-line .cm-header-3 { font-size: 18px; font-weight: 600; color: var(--winui-text-primary); }
+
+/* 2. 粗体和斜体 */
+.CodeMirror-line .cm-strong { font-weight: 700; color: var(--winui-accent); }
+.CodeMirror-line .cm-em { font-style: italic; color: var(--winui-text-secondary); }
+
+/* 3. 链接 */
+.CodeMirror-line .cm-link { color: var(--winui-accent); text-decoration: underline; }
+
+/* 4. 代码块背景 */
+.CodeMirror-line .cm-comment { background: rgba(0,0,0,0.05); border-radius: 3px; padding: 0 4px; font-family: 'Cascadia Code', monospace; }
+.dark-mode .CodeMirror-line .cm-comment { background: rgba(255,255,255,0.1); }
+
+/* 5. 引用块 */
+.CodeMirror-line .cm-quote { color: var(--winui-text-secondary); border-left: 3px solid var(--winui-accent); padding-left: 8px; margin-left: 0; }
+
+/* 6. 列表项 */
+.CodeMirror-line .cm-list-1::before { content: "• "; color: var(--winui-text-secondary); }
+.CodeMirror-line .cm-list-2::before { content: "1. "; color: var(--winui-text-secondary); }
+
+/* 7. 图片占位符 (需要 JS 配合插入 widget) */
+.cm-image-widget {
+    display: inline-block;
+    height: 100px; /* 固定高度防止跳动 */
+    vertical-align: middle;
+    margin: 5px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: #eee url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>') no-repeat center;
+    background-size: 50%;
+}
+
+/* =========================================
+   编辑器语义化着色 (Semantic Coloring)
+   ========================================= */
+
+/* 标题层级颜色 */
+.CodeMirror-line .cm-header-1 { color: #1a3c6e !important; } /* 深蓝 */
+.CodeMirror-line .cm-header-2 { color: #2b5ea7 !important; } /* 蓝色 */
+.CodeMirror-line .cm-header-3 { color: #4a90d9 !important; } /* 浅蓝 */
+.CodeMirror-line .cm-header-4,
+.CodeMirror-line .cm-header-5,
+.CodeMirror-line .cm-header-6 { color: #6ba3e0 !important; } /* 更浅蓝 */
+
+/* 代码块颜色 */
+.CodeMirror-line .cm-inline-code { 
+    color: #8b5cf6 !important; /* 紫色 */
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 3px;
+    padding: 0 3px;
+}
+.CodeMirror-line .cm-fenced-code { 
+    color: #c2410c !important; /* 深橙色 */
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+}
+
+/* 链接与图片颜色 */
+.CodeMirror-line .cm-link-text { 
+    color: #0891b2 !important; /* 绿蓝色 */
+    text-decoration: underline;
+    text-decoration-color: rgba(8, 145, 178, 0.4);
+}
+.CodeMirror-line .cm-image-link { 
+    color: #db2777 !important; /* 粉色 */
+    background: rgba(219, 39, 119, 0.06);
+    border-radius: 3px;
+    padding: 0 3px;
+}
+
+/* ---- 深色模式适配 ---- */
+.dark-mode .CodeMirror-line .cm-header-1 { color: #7cb3f0 !important; }
+.dark-mode .CodeMirror-line .cm-header-2 { color: #60a5fa !important; }
+.dark-mode .CodeMirror-line .cm-header-3 { color: #93c5fd !important; }
+.dark-mode .CodeMirror-line .cm-inline-code { color: #c4b5fd !important; background: rgba(196, 181, 253, 0.1); }
+.dark-mode .CodeMirror-line .cm-fenced-code { color: #fb923c !important; }
+.dark-mode .CodeMirror-line .cm-link-text { color: #67e8f9 !important; text-decoration-color: rgba(103, 232, 249, 0.4); }
+.dark-mode .CodeMirror-line .cm-image-link { color: #f9a8d4 !important; background: rgba(249, 168, 212, 0.08); }
+
+/* =========================================
+   深色模式 - 编辑器专属配色 (Editor Dark Mode Fix)
+   ========================================= */
+
+/* 1. 编辑器整体背景与文字 */
+.dark-mode .CodeMirror {
+    background-color: #2c2c2c !important; /* 与 #preview 背景一致 */
+    color: #d4d4d4 !important;            /* 浅灰文字，高对比度 */
+}
+
+/* 2. 行号区域 */
+.dark-mode .CodeMirror-gutters {
+    background-color: #252525 !important; /* 比编辑区稍暗，区分层级 */
+    border-right-color: #3e3e3e !important;
+    color: #858585 !important;            /* 行号颜色 */
+}
+
+/* 3. 光标颜色 */
+.dark-mode .CodeMirror-cursor {
+    border-left-color: #ffffff !important; /* 白色光标，确保可见 */
+}
+
+/* 4. 选中文字背景 */
+.dark-mode .CodeMirror-selected {
+    background-color: rgba(76, 194, 255, 0.2) !important; /* 使用 Accent 色的半透明 */
+}
+
+/* 5. 激活行的背景高亮（可选，提升聚焦感） */
+.dark-mode .CodeMirror-activeline-background {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+
+.dark-mode .CodeMirror-line .cm-header-1,
+.dark-mode .CodeMirror-line .cm-header-2,
+.dark-mode .CodeMirror-line .cm-header-3 {
+    color: #9cdcfe !important; /* 亮蓝色系，适合深色背景 */
+}
+
+.dark-mode .CodeMirror-line .cm-strong {
+    color: #ffffff !important; /* 粗体用纯白 */
+}
+
+.dark-mode .CodeMirror-line .cm-em {
+    color: #cccccc !important; /* 斜体用浅灰 */
+}
+
+.dark-mode .CodeMirror-line .cm-inline-code {
+    color: #ce9178 !important; /* 橙色系，区别于普通文字 */
+    background: rgba(206, 145, 120, 0.1) !important;
+}
+
+.dark-mode .CodeMirror-line .cm-fenced-code {
+    color: #b5cea8 !important; /* 绿色系，模拟 VS Code 字符串颜色 */
+}
+
+.dark-mode .CodeMirror-line .cm-link-text {
+    color: #9cdcfe !important;
+}
+
+.dark-mode .CodeMirror-line .cm-image-link {
+    color: #c586c0 !important; /* 紫色系 */
+}
+
+/* =========================================
+   状态栏新版布局 (Status Bar V2)
+   ========================================= */
+#status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 12px;
+    color: var(--winui-text-secondary);
+    height: 28px;
+    background-color: var(--winui-mica);
+    backdrop-filter: var(--winui-blur);
+    border-top: 1px solid var(--winui-border-light);
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-divider {
+    color: var(--winui-border-light);
+    margin: 0 2px;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: var(--winui-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.status-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--winui-accent);
+}
+
+.dark-mode .status-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.status-btn svg {
+    stroke: currentColor;
 }
