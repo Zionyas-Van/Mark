@@ -565,3 +565,135 @@ ERROR 2026-07-17 17:07:02,469 NE_RS_UNBLDRE: Unable to load application resource
 ERROR 2026-07-17 17:07:02,475 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
 INFO 2026-07-17 17:07:32,074 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
 ERROR 2026-07-17 17:07:36,426 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 17:57:59,953 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 17:58:03,836 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:03:12,431 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:05:19,372 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:06:15,042 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:08:15,376 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:08:15,405 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:09:01,615 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:11:16,372 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:11:41,186 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:15:37,241 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:16:31,049 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:25:14,180 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:26:05,652 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:30:08,890 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:31:10,340 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:33:44,774 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:34:07,024 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:35:18,836 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:38:20,199 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:38:32,756 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:41:14,206 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:41:56,037 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:44:38,829 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 18:44:47,888 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 18:44:47,939 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:49:48,027 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:50:33,425 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:51:09,932 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:54:18,745 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:56:59,460 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 18:57:45,768 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:01:12,359 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:01:54,621 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:02:20,122 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:02:28,470 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:02:51,967 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:04:22,195 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:17:34,945 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:18:11,119 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:18:17,839 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:18:33,250 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 19:18:37,518 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:21:52,749 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:21:52,754 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:21:52,757 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:21:52,792 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:24:30,580 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:26:29,617 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 19:26:32,802 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:31:03,862 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:35:55,565 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:38:14,345 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:46:02,884 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:48:52,439 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:49:41,564 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:50:04,293 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:50:33,546 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:51:07,264 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:51:15,723 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-17 19:51:20,144 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:54:54,490 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:58:00,293 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 19:58:34,351 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:02:14,210 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:17:15,960 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:17:15,996 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:23:39,624 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:23:39,632 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:24:54,731 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:28:12,996 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:36:04,296 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:36:36,230 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:36:55,276 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:37:12,013 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:38:47,001 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:45:58,453 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:47:14,846 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:48:36,085 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:49:12,761 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:50:21,690 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:55:18,600 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 20:57:23,109 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 21:08:05,468 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 21:09:16,449 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 21:13:34,885 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-17 21:14:39,354 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 08:48:03,503 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 08:48:07,860 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 08:56:00,274 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 08:56:42,401 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:01:11,830 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:10:08,374 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:13:26,601 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:13:30,767 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:16:56,236 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:17:00,663 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:17:45,122 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:17:52,007 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:17:58,795 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:21:24,688 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:21:25,801 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:21:27,365 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:21:28,826 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:21:59,423 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:22:24,316 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:22:27,492 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:23:34,867 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:23:40,493 NE_RS_UNBLDRE: Unable to load application resource file /resources/.well-known/appspecific/com.chrome.devtools.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:23:53,022 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:23:57,452 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:24:49,583 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:34:40,761 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:35:43,677 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:37:18,546 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:38:14,143 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:39:05,884 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:39:27,130 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:39:41,336 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:40:02,873 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:40:21,016 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:40:35,822 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:41:15,470 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:41:19,104 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:41:28,446 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:41:32,480 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:47:03,379 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:47:23,218 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:47:27,068 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:50:31,313 Auth info was exported to ./.tmp/auth_info.json D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1
+ERROR 2026-07-18 09:50:34,807 NE_RS_UNBLDRE: Unable to load application resource file /resources/favicon.ico D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:17 ZionyasVan@我的WINDOWS10-1
+INFO 2026-07-18 09:51:51,205 Reloading the application... D:\a\neutralinojs\neutralinojs\api\debug\debug.cpp:14 ZionyasVan@我的WINDOWS10-1

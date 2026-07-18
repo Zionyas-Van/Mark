@@ -722,9 +722,7 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
 .dark-mode .CodeMirror-line .cm-link-text { color: #67e8f9 !important; text-decoration-color: rgba(103, 232, 249, 0.4); }
 .dark-mode .CodeMirror-line .cm-image-link { color: #f9a8d4 !important; background: rgba(249, 168, 212, 0.08); }
 
-/* =========================================
-   状态栏新版布局 (Status Bar V2)
-   ========================================= */
+
 #status-bar {
     display: flex;
     justify-content: space-between;

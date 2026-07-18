@@ -861,9 +861,7 @@ body, #toolbar, #sidebar, #status-bar, .menu-btn, .tool-btn, .file-item {
     color: #c586c0 !important; /* 紫色系 */
 }
 
-/* =========================================
-   状态栏新版布局 (Status Bar V2)
-   ========================================= */
+
 #status-bar {
     display: flex;
     justify-content: space-between;

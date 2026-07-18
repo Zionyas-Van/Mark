@@ -1,5 +1,5 @@
 #define MyAppName "Mark"
-#define MyAppVersion "0.1.20260716"
+#define MyAppVersion "1.0.20260717"
 #define MyAppPublisher "ZionyasVan"
 #define MyAppExeName "Mark-win_x64.exe"
 

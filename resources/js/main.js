@@ -1,6 +1,90 @@
-// ==========================================
-// 1. 启动检查与全局变量
-// ==========================================
+const MarkNet = {
+    // 通用 Fetch 封装
+    fetch: async function(url, options = {}) {
+        try {
+            return await fetch(url, options);
+        } catch (error) {
+            console.error("Network Request Failed:", error);
+            throw error;
+        }
+    },
+
+    // GitHub API 专用请求
+    githubRequest: async function(path, method = 'GET', body = null) {
+        const token = appSettings.ghToken;
+        const owner = appSettings.ghOwner;
+        const repo = appSettings.ghRepo;
+        const branch = appSettings.ghBranch || 'main';
+
+        if (!token || !owner || !repo) {
+            throw new Error("请先在设置中配置 GitHub Token、用户名和仓库名");
+        }
+
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const headers = {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+        };
+
+        if (body) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        return await this.fetch(url, {
+            method: method,
+            headers: headers,
+            body: body ? JSON.stringify(body) : null
+        });
+    },
+
+
+    webdavRequest: async function(path, method = 'PROPFIND', body = null) {
+        let baseUrl = appSettings.wdUrl;
+        const dir = appSettings.wdDir || '/';
+        
+        if (!baseUrl) throw new Error("WebDAV 地址未配置");
+
+        if (!baseUrl.endsWith('/')) baseUrl += '/';
+        let cleanDir = dir.startsWith('/') ? dir : '/' + dir;
+
+        let fullPath = baseUrl + cleanDir.substring(1); 
+        if (path && path !== '/') {
+            let cleanPath = path.startsWith('/') ? path.substring(1) : path;
+            fullPath += '/' + cleanPath;
+        }
+
+        const user = appSettings.wdUser;
+        const pass = appSettings.wdPass;
+        
+
+        const headers = {
+            'Authorization': 'Basic ' + btoa(user + ':' + pass),
+            'Depth': '1' 
+        };
+
+        if (method === 'PUT') {
+            headers['Content-Type'] = 'application/octet-stream'; 
+        } else if (method === 'PROPFIND' || method === 'MKCOL') {
+            headers['Content-Type'] = 'application/xml; charset=utf-8';
+        }
+
+        console.log(`[WebDAV Native] ${method} -> ${fullPath}`);
+
+        try {
+            const response = await Neutralino.net.fetch(fullPath, {
+                method: method,
+                headers: headers,
+                body: body
+            });
+            return response;
+        } catch (err) {
+            console.error("Neutralino.net.fetch failed:", err);
+            throw err;
+        }
+    }
+};
+
+
 function checkDependencies() {
     const missing = [];
     if (typeof Neutralino === 'undefined') missing.push('Neutralino');
@@ -36,7 +120,11 @@ let appSettings = {
     ghOwner: "",
     ghRepo: "",
     ghPathTemplate: "imgs/{YYYY}-{MM}-{DD}",
-    ghBranch: "master"
+    ghBranch: "master",
+    wdUrl: "",
+    wdUser: "",
+    wdPass: "",
+    wdDir: "/MarkNotes/"
 };
 
 // ==========================================
@@ -74,17 +162,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     // 初始化 CodeMirror
+    // 初始化 CodeMirror
     editor = CodeMirror(document.getElementById("editor-container"), {
         mode: "markdown", 
         lineNumbers: true, 
         theme: "default",
         lineWrapping: true, 
-        readOnly: false, // 
+        readOnly: false,
         value: "",
+        viewportMargin: 10, 
         extraKeys: {
             "Enter": "newlineAndIndentContinueMarkdownList" 
         }
     });
+
+
 
     // --- 编辑器实时样式装饰器开始 ---
     let markerMap = new Map(); 
@@ -1661,19 +1753,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const content = await Neutralino.filesystem.readFile(SETTINGS_FILE);
             const loaded = JSON.parse(content);
-            appSettings = { ...appSettings, ...loaded }; // 合并默认值
+            // 合并默认值，防止缺少字段导致报错
+            appSettings = { ...appSettings, ...loaded }; 
+            console.log("设置加载成功:", appSettings);
         } catch (err) {
-            console.log("未找到配置文件");
+            console.log("未找到配置文件或解析失败，使用默认设置");
+            // 如果文件不存在，尝试创建一个默认的
+            try {
+                await saveSettings();
+            } catch(e) {}
         }
-        // 更新自动保存计时器
+        // 根据加载的设置更新运行时状态
         startAutoSaveTimer();
+        applyTheme(appSettings.theme);
     }
 
     async function saveSettings() {
         try {
             await Neutralino.filesystem.writeFile(SETTINGS_FILE, JSON.stringify(appSettings, null, 2));
-            showToast("设置已保存", "success");
-        } catch (err) { showToast("保存失败", "error"); }
+            console.log("设置已写入文件");
+        } catch (err) { 
+            console.error("保存设置失败:", err); 
+            showToast("保存设置文件失败", "error"); 
+        }
     }
 
     // 皮肤切换逻辑
@@ -1712,560 +1814,462 @@ document.addEventListener('DOMContentLoaded', async function() {
     };
 
 
+
     window.openSettingsModal = function() {
+        const modal = document.getElementById('settings-modal');
         const autosaveInput = document.getElementById('setting-autosave');
+        const syncScrollCheck = document.getElementById('setting-sync-scroll');
         const themeSelect = document.getElementById('setting-theme');
-        const syncScrollCheck = document.getElementById('setting-sync-scroll'); 
-        
+        if (themeSelect) themeSelect.value = appSettings.theme || 'default';
+        if (autosaveInput) autosaveInput.value = appSettings.autoSaveInterval || 30;
+        if (syncScrollCheck) syncScrollCheck.checked = appSettings.syncScroll !== false;
+        if (!modal) {
+            console.error("未找到设置窗口 DOM 元素");
+            return;
+        }
+
+        // 1. 填充 GitHub 设置
         const ghTokenInput = document.getElementById('setting-gh-token');
         const ghOwnerInput = document.getElementById('setting-gh-owner');
         const ghRepoInput = document.getElementById('setting-gh-repo');
         const ghBranchInput = document.getElementById('setting-gh-branch');
         const ghPathInput = document.getElementById('setting-gh-path');
 
-        const modal = document.getElementById('settings-modal');
+        if (ghTokenInput) ghTokenInput.value = appSettings.ghToken || "";
+        if (ghOwnerInput) ghOwnerInput.value = appSettings.ghOwner || "";
+        if (ghRepoInput) ghRepoInput.value = appSettings.ghRepo || "";
+        if (ghBranchInput) ghBranchInput.value = appSettings.ghBranch || "main";
+        if (ghPathInput) ghPathInput.value = appSettings.ghPathTemplate || "imgs/{YYYY}-{MM}-{DD}";
 
-        if (modal) {
-            if (autosaveInput) autosaveInput.value = appSettings.autoSaveInterval;
-            if (themeSelect) themeSelect.value = appSettings.theme;
-            if (syncScrollCheck) syncScrollCheck.checked = appSettings.syncScroll; 
-            
-            if (ghTokenInput) ghTokenInput.value = appSettings.ghToken || "";
-            if (ghOwnerInput) ghOwnerInput.value = appSettings.ghOwner || "";
-            if (ghRepoInput) ghRepoInput.value = appSettings.ghRepo || "";
-            if (ghBranchInput) ghBranchInput.value = appSettings.ghBranch || "main";
-            if (ghPathInput) ghPathInput.value = appSettings.ghPathTemplate || "imgs/{YYYY}-{MM}-{DD}";
+        // 2. 填充 WebDAV 设置
+        const wdUrlInput = document.getElementById('setting-wd-url');
+        const wdUserInput = document.getElementById('setting-wd-user');
+        const wdPassInput = document.getElementById('setting-wd-pass');
+        const wdDirInput = document.getElementById('setting-wd-dir');
 
-            switchSettingTab('general', document.querySelector('.setting-nav-item')); 
-            
-            modal.style.display = 'flex';
-        }
+        if (wdUrlInput) wdUrlInput.value = appSettings.wdUrl || "";
+        if (wdUserInput) wdUserInput.value = appSettings.wdUser || "";
+        if (wdPassInput) wdPassInput.value = appSettings.wdPass || "";
+        if (wdDirInput) wdDirInput.value = appSettings.wdDir || "/MarkNotes/";
+
+        // 3. 强制切换到“绑定与数据安全”标签页
+        // 先隐藏所有标签内容
+        document.querySelectorAll('.setting-tab-content').forEach(el => el.style.display = 'none');
+        // 显示 account 标签
+        const accountTab = document.getElementById('tab-account');
+        if (accountTab) accountTab.style.display = 'block';
+        
+        // 更新导航栏激活状态
+        document.querySelectorAll('.setting-nav-item').forEach(el => el.classList.remove('active'));
+        const accountNav = document.querySelector('.setting-nav-item[onclick*="account"]');
+        if (accountNav) accountNav.classList.add('active');
+
+        // 4. 显示模态框
+        modal.style.display = 'flex';
     };
 
     window.closeSettingsModal = function() {
         const modal = document.getElementById('settings-modal');
-        if (modal) modal.style.display = 'none';
+        if (modal) {
+            modal.style.display = 'none';
+        }
     };
 
-    window.applySettingsFromUI = function() {
-        const autosaveInput = document.getElementById('setting-autosave');
-        const themeSelect = document.getElementById('setting-theme');
-        const syncScrollCheck = document.getElementById('setting-sync-scroll');
-        
-        // 获取图床配置元素
-        const ghTokenInput = document.getElementById('setting-gh-token');
-        const ghOwnerInput = document.getElementById('setting-gh-owner');
-        const ghRepoInput = document.getElementById('setting-gh-repo');
-        const ghBranchInput = document.getElementById('setting-gh-branch');
-        const ghPathInput = document.getElementById('setting-gh-path');
-
-        if (!autosaveInput || !themeSelect) return;
-
-        // 1. 基础设置
-        const autosaveVal = parseInt(autosaveInput.value);
-        const themeVal = themeSelect.value;
-        const syncScrollVal = syncScrollCheck ? syncScrollCheck.checked : true;
-
-        if (!isNaN(autosaveVal) && autosaveVal > 0) {
-            appSettings.autoSaveInterval = autosaveVal;
-            startAutoSaveTimer();
-        }
-        
-        if (themeVal) {
-            appSettings.theme = themeVal;
-            applyTheme(themeVal); 
-        }
-
-        if (syncScrollCheck) {
-            if (appSettings.syncScroll !== syncScrollVal) {
-                appSettings.syncScroll = syncScrollVal;
-                initScrollSync();
+    window.saveBindingSettings = function() {
+        try { 
+            const autosaveInput = document.getElementById('setting-autosave');
+            const syncScrollCheck = document.getElementById('setting-sync-scroll');
+            const themeSelect = document.getElementById('setting-theme'); 
+            
+            if (autosaveInput) {
+                let val = parseInt(autosaveInput.value);
+                if (val >= 1 && val <= 3600) {
+                    appSettings.autoSaveInterval = val;
+                }
             }
-        }
+            if (syncScrollCheck) {
+                appSettings.syncScroll = syncScrollCheck.checked;
+            }
 
-        if (ghTokenInput && ghOwnerInput && ghRepoInput) {
-            appSettings.ghToken = ghTokenInput.value.trim();
-            appSettings.ghOwner = ghTokenInput.value.trim() ? appSettings.ghOwner : ""; // 如果清空了 token，保留 owner 但可能无法上传
-            
-            appSettings.ghOwner = ghOwnerInput.value.trim();
-            appSettings.ghRepo = ghRepoInput.value.trim();
-            
+            if (themeSelect) {
+                appSettings.theme = themeSelect.value;
+                applyTheme(appSettings.theme); 
+            }
+
+            const ghTokenInput = document.getElementById('setting-gh-token');
+            const ghOwnerInput = document.getElementById('setting-gh-owner');
+            const ghRepoInput = document.getElementById('setting-gh-repo');
+            const ghBranchInput = document.getElementById('setting-gh-branch');
+
+            if (ghTokenInput) appSettings.ghToken = ghTokenInput.value.trim();
+            if (ghOwnerInput) appSettings.ghOwner = ghOwnerInput.value.trim();
+            if (ghRepoInput) appSettings.ghRepo = ghRepoInput.value.trim();
             if (ghBranchInput) appSettings.ghBranch = ghBranchInput.value.trim() || "main";
-            if (ghPathInput) appSettings.ghPathTemplate = ghPathInput.value.trim() || "imgs/{YYYY}-{MM}-{DD}";
-            
-            console.log("图床配置已更新:", {
-                owner: appSettings.ghOwner,
-                repo: appSettings.ghRepo,
-                branch: appSettings.ghBranch
+
+            const wdUrlInput = document.getElementById('setting-wd-url');
+            const wdUserInput = document.getElementById('setting-wd-user');
+            const wdPassInput = document.getElementById('setting-wd-pass');
+            const wdDirInput = document.getElementById('setting-wd-dir');
+
+            if (wdUrlInput) {
+                let url = wdUrlInput.value.trim();
+                if (url && !url.endsWith('/')) url += '/';
+                appSettings.wdUrl = url;
+            }
+            if (wdUserInput) appSettings.wdUser = wdUserInput.value.trim();
+            if (wdPassInput) appSettings.wdPass = wdPassInput.value; 
+            if (wdDirInput) {
+                let dir = wdDirInput.value.trim();
+                if (dir && !dir.startsWith('/')) dir = '/' + dir;
+                if (dir && !dir.endsWith('/')) dir += '/';
+                appSettings.wdDir = dir || "/MarkNotes/";
+            }
+
+            saveSettings();
+
+            startAutoSaveTimer();
+            initScrollSync(); 
+
+            closeSettingsModal();
+            showToast("所有配置已保存并生效", "success");
+        } catch (err) {
+            console.error("保存设置失败:", err);
+            showToast("保存失败: " + err.message, "error");
+        }
+    };
+
+    // 2. 构造 WebDAV 基础认证头
+    function getWebDavAuthHeader() {
+        if (!appSettings.wdUser || !appSettings.wdPass) return null;
+        try {
+            const auth = btoa(`${appSettings.wdUser}:${appSettings.wdPass}`);
+            return `Basic ${auth}`;
+        } catch (e) { return null; }
+    }
+
+
+    // 4. 上传单个文件到 WebDAV
+    async function uploadFileToWebDav(localPath, remoteName) {
+        try {
+            const content = await Neutralino.filesystem.readFile(localPath);
+            const baseUrl = appSettings.wdUrl.replace(/\/$/, '');
+            const remoteUrl = `${baseUrl}${appSettings.wdDir}${remoteName}`;
+
+            const response = await Neutralino.net.fetch(remoteUrl, {
+                method: 'PUT',
+                headers: { 'Authorization': getWebDavAuthHeader() },
+                body: content
             });
+
+            return response.status >= 200 && response.status < 300;
+        } catch (err) {
+            console.error(`上传失败 [${remoteName}]:`, err);
+            return false;
+        }
+    }
+
+    // 5. 全量同步
+    window.syncAllToWebDav = async function() {
+        if (!appSettings.wdUrl || !appSettings.wdUser) {
+            showToast("请先配置并保存 WebDAV 信息", "error");
+            return;
         }
 
-        saveSettings(); 
-        showToast("所有设置已保存", "success");
-    };
-    
-    // =========================================
-    // 配置备份与恢复
-    // =========================================
+        showToast("开始全量同步，请稍候...", "info");
+        let successCount = 0;
+        let failCount = 0;
 
-    // 1. 备份设置
+        try {
+            const files = await getAllMarkdownFiles(DATA_DIR_ROOT);
+            if (files.length === 0) {
+                showToast("未找到任何 .md 文件", "info");
+                return;
+            }
+
+            for (const filePath of files) {
+                const relativePath = filePath.replace(DATA_DIR_ROOT + '/', '').replace(/\\/g, '/');
+                const isSuccess = await uploadFileToWebDav(filePath, relativePath);
+                if (isSuccess) successCount++;
+                else failCount++;
+            }
+            
+            showToast(`同步完成：成功 ${successCount} 个，失败 ${failCount} 个`, successCount > 0 ? "success" : "error");
+        } catch (err) {
+            showToast("同步出错: " + err.message, "error");
+        }
+    };
+
+    async function getAllMarkdownFiles(dirPath) {
+        let results = [];
+        try {
+            const entries = await Neutralino.filesystem.readDirectory(dirPath);
+            for (const entry of entries) {
+                const name = entry.entryName || entry.entry;
+                if (name === '.Trash' || name === 'skins') continue;
+                const fullPath = `${dirPath}/${name}`;
+                if (entry.type === 'DIRECTORY') {
+                    results = results.concat(await getAllMarkdownFiles(fullPath));
+                } else if (name.endsWith('.md')) {
+                    results.push(fullPath);
+                }
+            }
+        } catch (e) {}
+        return results;
+    }
+
+
+    window.uploadImageToGithub = async function(file) {
+        if (!appSettings.ghToken || !appSettings.ghOwner || !appSettings.ghRepo) {
+            showToast("请先在设置中配置图床", "error");
+            return null;
+        }
+
+        try {
+            showToast("正在检查图片状态", "info");
+            const base64Data = await readFileAsBase64(file);
+            const content = base64Data.split(',')[1];
+            const remotePath = generateRemotePath(file.name);
+            
+            let sha = null;
+            try {
+                const checkResponse = await MarkNet.githubRequest(remotePath, 'GET');
+                if (checkResponse.ok) {
+                    const existingData = await checkResponse.json();
+                    sha = existingData.sha;
+                    console.log("文件已存在，获取到 SHA:", sha);
+                }
+            } catch (e) {
+                console.log("文件不存在，将执行新建操作");
+            }
+
+            showToast("正在上传图片", "info");
+            
+            // 2. 构造 PUT 请求的 Body
+            const putBody = {
+                message: `Upload via Mark Editor: ${file.name}`,
+                content: content,
+                branch: appSettings.ghBranch
+            };
+            
+            // 3. 如果文件已存在
+            if (sha) {
+                putBody.sha = sha;
+            }
+
+            // 4. 发送 PUT 请求
+            const response = await MarkNet.githubRequest(remotePath, 'PUT', putBody);
+
+            const result = await response.json();
+            if (result.content && result.content.download_url) {
+                showToast("与 Github 的链接成功", "success");
+                return result.content.download_url;
+            } else {
+                showToast("上传终止: " + (result.message || "未知错误"), "error");
+                return null;
+            }
+        } catch (err) {
+            showToast("上传终止: " + err.message, "error");
+            return null;
+        }
+    };
+
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function generateRemotePath(fileName) {
+        let path = appSettings.ghPathTemplate;
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        let mdName = "unknown";
+        if (currentFilePath) mdName = currentFilePath.split('/').pop().replace(/\.[^/.]+$/, "");
+        
+        path = path.replace('{YYYY}', yyyy).replace('{MM}', mm).replace('{DD}', dd).replace('{MDNAME}', mdName);
+        if (!path.endsWith('/')) path += '/';
+        return `${path}${fileName}`;
+    }
+    
+    // 配置备份与恢复 (保持简洁)
     window.backupSettings = async function() {
         try {
-            // 弹出保存对话框，让用户选择备份文件存哪
-            const result = await Neutralino.os.showSaveDialog("备份 Mark 设置", {
-                filters: [{ name: "JSON Files", extensions: ["json"] }]
-            });
-            
+            const result = await Neutralino.os.showSaveDialog("备份 Mark 设置", { filters: [{ name: "JSON Files", extensions: ["json"] }] });
             if (result) {
-                // 读取当前内存中的设置
-                const content = JSON.stringify(appSettings, null, 2);
-                // 写入用户选择的路径
-                await Neutralino.filesystem.writeFile(result, content);
+                await Neutralino.filesystem.writeFile(result, JSON.stringify(appSettings, null, 2));
                 showToast("设置备份成功！", "success");
             }
-        } catch (err) {
-            console.error(err);
-            showToast("备份失败", "error");
-        }
+        } catch (err) { showToast("备份失败", "error"); }
     };
 
-    // 2. 恢复设置
     window.restoreSettings = async function() {
         try {
-            // 弹出打开对话框，让用户选择备份文件
-            const result = await Neutralino.os.showOpenDialog("恢复 Mark 设置", {
-                filters: [{ name: "JSON Files", extensions: ["json"] }]
-            });
-            
+            const result = await Neutralino.os.showOpenDialog("恢复 Mark 设置", { filters: [{ name: "JSON Files", extensions: ["json"] }] });
             if (result && result.length > 0) {
-                const filePath = result[0];
-                const content = await Neutralino.filesystem.readFile(filePath);
-                const loadedSettings = JSON.parse(content);
-                
-                // 合并设置
-                appSettings = { ...appSettings, ...loadedSettings };
-                
-                // 应用新设置
+                const content = await Neutralino.filesystem.readFile(result[0]);
+                appSettings = { ...appSettings, ...JSON.parse(content) };
                 applyTheme(appSettings.theme);
                 startAutoSaveTimer();
-                
-                // 保存到本地 settings.json
                 await saveSettings();
-                
-                showToast("设置已恢复，请重启软件以完全生效", "success");
+                showToast("设置已恢复", "success");
             }
-        } catch (err) {
-            console.error(err);
-            showToast("恢复失败，请检查文件格式", "error");
-        }
+        } catch (err) { showToast("恢复失败", "error"); }
     };
 
-
-    // =========================================
     // 自定义皮肤导入
-    // =========================================
-
     window.importCustomSkin = async function() {
         try {
-            const result = await Neutralino.os.showOpenDialog("选择 CSS 皮肤文件", {
-                filters: [{ name: "CSS Files", extensions: ["css"] }]
-            });
-            
+            const result = await Neutralino.os.showOpenDialog("选择 CSS 皮肤文件", { filters: [{ name: "CSS Files", extensions: ["css"] }] });
             if (result && result.length > 0) {
                 const sourcePath = result[0];
-                const fileName = sourcePath.split(/[/\\]/).pop(); // 获取文件名
-                
+                const fileName = sourcePath.split(/[/\\]/).pop();
                 const skinsDir = `${DATA_DIR_ROOT}/skins`;
                 await Neutralino.filesystem.createDirectory(skinsDir).catch(() => {});
-                
-                const targetPath = `${skinsDir}/${fileName}`;
-                
-                // 读取源文件内容
                 const content = await Neutralino.filesystem.readFile(sourcePath);
-                
-                // 写入到用户数据目录
-                await Neutralino.filesystem.writeFile(targetPath, content);
-                
+                await Neutralino.filesystem.writeFile(`${skinsDir}/${fileName}`, content);
                 showToast(`皮肤 "${fileName}" 导入成功！`, "success");
-                
-                // 立即应用新皮肤
-                const link = document.getElementById('theme-style');
-                if (link) {
-                    link.href = '';
-                    setTimeout(() => { 
-                        applyCustomSkin(fileName); 
-                    }, 10);
-                }
-                
-                // 更新设置
+                applyCustomSkin(fileName);
                 appSettings.theme = `custom:${fileName}`; 
                 saveSettings();
             }
-        } catch (err) {
-            console.error("导入皮肤错误:", err);
-            showToast(`导入失败: ${err.message}`, "error");
-        }
+        } catch (err) { showToast(`导入失败: ${err.message}`, "error"); }
     };
 
-    // =========================================
-    // 自定义皮肤
-    // =========================================
     window.applyCustomSkin = async function(fileName) {
         try {
             const skinPath = `${DATA_DIR_ROOT}/skins/${fileName}`;
-            
-            // 1. 读取 CSS 文件的文本内容
             const content = await Neutralino.filesystem.readFile(skinPath);
-            
-            // 2. 查找是否已经存在用于自定义皮肤的 style 标签
             let customStyle = document.getElementById('custom-skin-style');
-            
-            // 3. 如果不存在，就创建一个并添加到 head 中
             if (!customStyle) {
                 customStyle = document.createElement('style');
                 customStyle.id = 'custom-skin-style';
                 document.head.appendChild(customStyle);
             }
-            
-            // 4. 将读取到的 CSS 内容直接写入 style 标签
             customStyle.innerHTML = content;
-            
-            console.log("当前自定义皮肤:", fileName);
-        } catch (err) {
-            console.error("应用自定义皮肤失败:", err);
-            showToast("应用皮肤失败", "error");
-        }
+        } catch (err) { showToast("应用皮肤失败", "error"); }
     };
 
-    // =========================================
     // 关于页面辅助弹窗
-    // =========================================
-
-    // 通用的全局弹窗生成器
     function showGlobalInfoModal(title, contentHtml, btnText = '关闭') {
-    
         const oldModal = document.getElementById('global-info-modal');
         if (oldModal) oldModal.remove();
-
         const modal = document.createElement('div');
         modal.id = 'global-info-modal';
-        modal.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 99999;
-        `;
-
-        modal.innerHTML = `
-            <div style="
-                background: var(--winui-bg-primary, #fff); 
-                color: var(--winui-text-primary, #000);
-                width: 450px; max-height: 80vh; 
-                border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                display: flex; flex-direction: column; overflow: hidden;
-            ">
-                <div style="padding: 20px; font-size: 18px; font-weight: 600; border-bottom: 1px solid var(--winui-border-light, #eee);">
-                    ${title}
-                </div>
-                <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px; line-height: 1.6;">
-                    ${contentHtml}
-                </div>
-                <div style="padding: 15px 20px; border-top: 1px solid var(--winui-border-light, #eee); text-align: right;">
-                    <button id="global-modal-close-btn" style="
-                        padding: 6px 20px; border-radius: 4px; border: 1px solid var(--winui-border-light, #ccc);
-                        background: var(--winui-accent, #005fb8); color: #fff; cursor: pointer; font-size: 14px;
-                    ">${btnText}</button>
-                </div>
-            </div>
-        `;
-
+        modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; z-index: 99999;`;
+        modal.innerHTML = `<div style="background: var(--winui-bg-primary, #fff); color: var(--winui-text-primary, #000); width: 450px; max-height: 80vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden;"><div style="padding: 20px; font-size: 18px; font-weight: 600; border-bottom: 1px solid var(--winui-border-light, #eee);">${title}</div><div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px; line-height: 1.6;">${contentHtml}</div><div style="padding: 15px 20px; border-top: 1px solid var(--winui-border-light, #eee); text-align: right;"><button id="global-modal-close-btn" style="padding: 6px 20px; border-radius: 4px; border: 1px solid var(--winui-border-light, #ccc); background: var(--winui-accent, #005fb8); color: #fff; cursor: pointer; font-size: 14px;">${btnText}</button></div></div>`;
         document.body.appendChild(modal);
-
-        const closeBtn = modal.querySelector('#global-modal-close-btn');
-        closeBtn.onclick = () => modal.remove();
-        
-        modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
-        };
+        modal.querySelector('#global-modal-close-btn').onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
 
-    // 隐私政策
-    window.showPrivacyPolicy = function() {
-        const content = `
-            <div style="text-align:left; font-size:13px; line-height:1.6;">
-                <p><strong>隐私政策摘要：</strong></p>
-                <p>1. Mark 是一款本地 Markdown 编辑器，所有数据均存储在您的本地设备上。</p>
-                <p>2. 我们不会收集、上传或共享您的任何笔记内容以及个人信息。</p>
-                <p>3. 软件仅在您主动点击“检查更新”、“打开外部链接”、“执行云备份”或其必要的账户登录时才会进行联网操作会连接互联网。</p>
-                <p>4. 您可以随时通过删除安装目录来彻底清除本软件及其配置，但我们会保留您的笔记内容以便后续恢复。</p>
-            </div>
-        `;
-        showGlobalInfoModal("隐私政策", content, "我知道了");
-    };
+    window.showPrivacyPolicy = function() { showGlobalInfoModal("隐私政策", "<div style='text-align:left; font-size:13px; line-height:1.6;'><p>1. Mark 是一款本地 Markdown 编辑器，所有数据均存储在您的本地设备上。</p><p>2. 我们不会收集、上传或共享您的任何笔记内容以及个人信息。</p><p>3. 软件仅在您主动点击“检查更新”、“打开外部链接”、“执行云备份”时才会进行联网操作。</p></div>", "我知道了"); };
+    window.showDependencies = function() { showGlobalInfoModal("依赖项说明", "<div style='text-align:left; font-size:13px; line-height:1.6;'><ul style='padding-left: 20px;'><li><strong>Neutralino:</strong> 跨平台轻量级应用框架</li><li><strong>Microsoft Edge Webview2:</strong> 运行 Mark 的必要依赖项</li><li><strong>CodeMirror:</strong> 浏览器端代码编辑器</li><li><strong>Marked:</strong> Markdown 解析器</li></ul></div>", "确认"); };
 
-    // 依赖项说明
-    window.showDependencies = function() {
-        const content = `
-            <div style="text-align:left; font-size:13px; line-height:1.6;">
-                <p><strong>核心依赖项：</strong></p>
-                <ul style="padding-left: 20px; margin-top: 5px;">
-                    <li><strong>Neutralino:</strong> 这是一致跨平台轻量级应用框架</li>
-                    <li><strong>Microsoft Edge Webview2:</strong> 这是运行 Mark 的必要依赖项</li>
-                    <li><strong>CodeMirror:</strong> 开发者可通过此工具编辑浏览器端代码</li>
-                    <li><strong>Marked:</strong> Mark 需要借此解析 Markdown 文章</li>
-                </ul>
-                <p style="margin-top:10px; color:var(--winui-text-secondary);">感谢所有开源社区贡献者的努力。</p>
-            </div>
-        `;
-        showGlobalInfoModal("依赖项说明", content, "确认");
-    };
-
-    // =========================================
     // 拖拽调整区域大小逻辑
-    // =========================================
-    
     function initResizers() {
         const sidebar = document.getElementById('sidebar');
         const editorContainer = document.getElementById('editor-container');
         const dragSidebar = document.getElementById('drag-sidebar');
         const dragPreview = document.getElementById('drag-preview');
-        
-        let isDragging = false;
-        let currentResizer = null;
-        let startX = 0;
-        let startWidthSidebar = 0;
-        let startWidthEditor = 0;
-
-        // 鼠标按下事件
+        let isDragging = false, currentResizer = null, startX = 0, startWidthSidebar = 0, startWidthEditor = 0;
         function onMouseDown(e, resizerType) {
-            isDragging = true;
-            currentResizer = resizerType;
-            startX = e.clientX;
-            
-            if (resizerType === 'sidebar') {
-                startWidthSidebar = sidebar.offsetWidth;
-            } else if (resizerType === 'preview') {
-                startWidthEditor = editorContainer.offsetWidth;
-            }
-            
-            document.body.classList.add('resizing');
-            document.body.style.cursor = 'col-resize';
-            e.preventDefault(); // 防止选中文本
+            isDragging = true; currentResizer = resizerType; startX = e.clientX;
+            if (resizerType === 'sidebar') startWidthSidebar = sidebar.offsetWidth;
+            else if (resizerType === 'preview') startWidthEditor = editorContainer.offsetWidth;
+            document.body.classList.add('resizing'); document.body.style.cursor = 'col-resize'; e.preventDefault();
         }
-
         dragSidebar.addEventListener('mousedown', (e) => onMouseDown(e, 'sidebar'));
         dragPreview.addEventListener('mousedown', (e) => onMouseDown(e, 'preview'));
-
-        // 鼠标移动事件
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            
             const dx = e.clientX - startX;
-
             if (currentResizer === 'sidebar') {
-                // 调整侧边栏宽度
                 const newWidth = startWidthSidebar + dx;
-                if (newWidth >= 180 && newWidth <= window.innerWidth * 0.5) {
-                    sidebar.style.width = `${newWidth}px`;
-                }
+                if (newWidth >= 180 && newWidth <= window.innerWidth * 0.5) sidebar.style.width = `${newWidth}px`;
             } else if (currentResizer === 'preview') {
-                // 调整编辑器宽度（从而间接调整预览区）
                 const newWidth = startWidthEditor + dx;
-                if (newWidth >= 200 && newWidth <= window.innerWidth * 0.8) {
-                    editorContainer.style.width = `${newWidth}px`;
-                }
+                if (newWidth >= 200 && newWidth <= window.innerWidth * 0.8) editorContainer.style.width = `${newWidth}px`;
             }
         });
-
-        // 鼠标松开事件
         document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                currentResizer = null;
-                document.body.classList.remove('resizing');
-                document.body.style.cursor = '';
-                
-                // 触发 CodeMirror 重新计算布局，防止显示异常
-                if (editor) editor.refresh();
-            }
+            if (isDragging) { isDragging = false; currentResizer = null; document.body.classList.remove('resizing'); document.body.style.cursor = ''; if (editor) editor.refresh(); }
         });
     }
-
-    // 在初始化完成后调用
     setTimeout(initResizers, 500); 
 
-
+    // 插入图片链接
     window.insertImageLink = async function() {
-        if (!currentFilePath || editor.getOption("readOnly")) {
-            showToast("你要把图片插入到空气里吗", "error");
-            return;
-        }
-
+        if (!currentFilePath || editor.getOption("readOnly")) { showToast("你要把图片插入到空气里吗", "error"); return; }
         const modal = document.getElementById('custom-modal');
         const titleEl = document.getElementById('modal-title');
         const msgEl = document.getElementById('modal-message');
         const inputEl = document.getElementById('modal-input');
         const confirmBtn = document.getElementById('modal-confirm-btn');
         const cancelBtn = document.getElementById('modal-cancel-btn');
-
-        const originalTitle = titleEl.innerText;
-        const originalMsg = msgEl.innerText;
-        const originalInputDisplay = inputEl.style.display;
-        const originalConfirmText = confirmBtn.innerText;
-        const originalConfirmOnClick = confirmBtn.onclick;
-
-        // 设置弹窗内容
+        const originalTitle = titleEl.innerText; const originalMsg = msgEl.innerText; const originalInputDisplay = inputEl.style.display; const originalConfirmText = confirmBtn.innerText; const originalConfirmOnClick = confirmBtn.onclick;
         titleEl.innerText = "插入图片";
-        msgEl.innerHTML = `
-            <div style="margin-bottom: 10px; font-size: 13px; color: var(--winui-text-secondary);">
-                请输入图片 URL，或本地上传。
-            </div>
-            <button id="btn-upload-local" class="winui-btn secondary" style="width: 100%; margin-bottom: 10px;">
-                上传图片
-            </button>
-            <div id="upload-status" style="font-size: 12px; color: #0067c0; display: none;"></div>
-        `;
-        
-        inputEl.style.display = 'block';
-        inputEl.placeholder = "https://example.com/image.png";
-        inputEl.value = ""; // 清空
-        confirmBtn.innerText = "确认插入";
-        cancelBtn.style.display = 'block';
-
-        // 2. 定义上传逻辑
-        const uploadBtn = document.getElementById('btn-upload-local');
-        const statusDiv = document.getElementById('upload-status');
-        
+        msgEl.innerHTML = `<div style="margin-bottom: 10px; font-size: 13px; color: var(--winui-text-secondary);">请输入图片 URL，或本地上传。</div><button id="btn-upload-local" class="winui-btn secondary" style="width: 100%; margin-bottom: 10px;">上传图片</button><div id="upload-status" style="font-size: 12px; color: #0067c0; display: none;"></div>`;
+        inputEl.style.display = 'block'; inputEl.placeholder = "https://example.com/image.png"; inputEl.value = ""; confirmBtn.innerText = "确认插入"; cancelBtn.style.display = 'block';
+        const uploadBtn = document.getElementById('btn-upload-local'); const statusDiv = document.getElementById('upload-status');
         uploadBtn.onclick = async () => {
-            // 检查配置
-            if (!appSettings.ghToken || !appSettings.ghOwner || !appSettings.ghRepo) {
-                showToast("请先在设置中配置 GitHub 图床信息", "error");
-                openSettingsModal(); 
-                return;
-            }
-
-            // 触发隐藏的文件选择器
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/png, image/jpeg, image/gif, image/webp';
-            
+            if (!appSettings.ghToken || !appSettings.ghOwner || !appSettings.ghRepo) { showToast("请先在设置中配置 GitHub 图床信息", "error"); openSettingsModal(); return; }
+            const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'image/png, image/jpeg, image/gif, image/webp';
             fileInput.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                // UI 反馈：正在上传
-                uploadBtn.disabled = true;
-                uploadBtn.innerText = "上传中...";
-                statusDiv.style.display = 'block';
-                statusDiv.innerText = "正在与 GitHub 链接";
-
+                const file = e.target.files[0]; if (!file) return;
+                uploadBtn.disabled = true; uploadBtn.innerText = "上传中..."; statusDiv.style.display = 'block'; statusDiv.innerText = "正在与 GitHub 链接";
                 try {
                     const url = await uploadImageToGithub(file);
-                    if (url) {
-                        inputEl.value = url; // 自动填入 URL
-                        statusDiv.innerText = "已获取图片链接。";
-                        statusDiv.style.color = "green";
-                        inputEl.focus();
-                    } else {
-                        statusDiv.innerText = "图片拉取失败，请查看日志文件。";
-                        statusDiv.style.color = "red";
-                    }
-                } catch (err) {
-                    statusDiv.innerText = "未知错误: " + err.message;
-                    statusDiv.style.color = "red";
-                } finally {
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerText = "上传图片";
-                }
+                    if (url) { inputEl.value = url; statusDiv.innerText = "已获取图片链接。"; statusDiv.style.color = "green"; inputEl.focus(); }
+                    else { statusDiv.innerText = "图片拉取失败，请查看日志文件。"; statusDiv.style.color = "red"; }
+                } catch (err) { statusDiv.innerText = "未知错误: " + err.message; statusDiv.style.color = "red"; }
+                finally { uploadBtn.disabled = false; uploadBtn.innerText = "上传图片"; }
             };
-            
             fileInput.click();
         };
-
-        // 3. 定义确认按钮逻辑
         confirmBtn.onclick = () => {
             const url = inputEl.value.trim();
             if (url) {
-                // 获取文件名作为 Alt Text
-                let fileName = "image";
-                try {
-                    fileName = url.split('/').pop().split('?')[0] || "image";
-                    if (fileName.length > 20) fileName = fileName.substring(0, 20) + "...";
-                } catch(e) {}
-
-                editor.replaceSelection(`![${fileName}](${url})`);
-                renderPreview(editor.getValue());
-                closeModal(null);
-            } else {
-                showToast("请输入有效的图片链接", "error");
-            }
+                let fileName = "image"; try { fileName = url.split('/').pop().split('?')[0] || "image"; if (fileName.length > 20) fileName = fileName.substring(0, 20) + "..."; } catch(e) {}
+                editor.replaceSelection(`![${fileName}](${url})`); renderPreview(editor.getValue()); closeModal(null);
+            } else { showToast("请输入有效的图片链接", "error"); }
         };
-
-        // 4. 定义取消/关闭后的恢复逻辑
-        const restoreModal = () => {
-            titleEl.innerText = originalTitle;
-            msgEl.innerText = originalMsg;
-            inputEl.style.display = originalInputDisplay;
-            confirmBtn.innerText = originalConfirmText;
-            confirmBtn.onclick = originalConfirmOnClick;
-        };
-
+        const restoreModal = () => { titleEl.innerText = originalTitle; msgEl.innerText = originalMsg; inputEl.style.display = originalInputDisplay; confirmBtn.innerText = originalConfirmText; confirmBtn.onclick = originalConfirmOnClick; };
         const oldClose = closeModal;
-        closeModal = function(result) {
-            restoreModal();
-            oldClose(result);
-            // 恢复原函数，防止影响其他弹窗
-            setTimeout(() => { closeModal = oldClose; }, 100); 
-        };
-        
-        // 显示弹窗
-        modal.style.display = 'flex';
-        setTimeout(() => inputEl.focus(), 100);
+        closeModal = function(result) { restoreModal(); oldClose(result); setTimeout(() => { closeModal = oldClose; }, 100); };
+        modal.style.display = 'flex'; setTimeout(() => inputEl.focus(), 100);
     };
 
-    // 2. 插入超链接
+    // 插入超链接
     window.insertHyperlink = async function() {
-        if (!currentFilePath || editor.getOption("readOnly")) {
-            showToast("你要把超链接插入到空气里吗", "error");
-            return;
-        }
-
-        const selection = editor.getSelection();
-        const defaultText = selection || "链接文字";
-        
+        if (!currentFilePath || editor.getOption("readOnly")) { showToast("你要把超链接插入到空气里吗", "error"); return; }
+        const selection = editor.getSelection(); const defaultText = selection || "链接文字";
         const url = await showCustomDialog("插入链接", "点击超链接文字后打开的地址 (URL):", "https://");
         if (url) {
             const text = await showCustomDialog("显示文字", "超链接显示的文字:", defaultText);
-            const markdown = `[${text}](${url})`;
-            editor.replaceSelection(markdown);
-            editor.focus();
-            renderPreview(editor.getValue());
-            showToast("超链接已插入", "success");
+            editor.replaceSelection(`[${text}](${url})`); editor.focus(); renderPreview(editor.getValue()); showToast("超链接已插入", "success");
         }
     };
 
-        // 设置窗口 Tab 切换
+    // 设置窗口 Tab 切换
     window.switchSettingTab = function(tabName, element) {
-        // 1. 隐藏所有内容
         document.querySelectorAll('.setting-tab-content').forEach(el => el.style.display = 'none');
-        // 2. 显示目标内容
         const targetTab = document.getElementById('tab-' + tabName);
         if (targetTab) targetTab.style.display = 'block';
-
-        // 3. 更新导航激活状态
         document.querySelectorAll('.setting-nav-item').forEach(el => el.classList.remove('active'));
         if (element) element.classList.add('active');
     };
 
-
     async function updateLocalUsername() {
         try {
             const result = await Neutralino.os.execCommand('whoami');
-            const username = result.stdOut.trim().split('\\').pop(); // 去掉域名前缀
+            const username = result.stdOut.trim().split('\\').pop();
             document.getElementById('local-username-display').innerText = username || "Local User";
-        } catch (e) {
-            document.getElementById('local-username-display').innerText = "Local User";
-        }
+        } catch (e) { document.getElementById('local-username-display').innerText = "Local User"; }
     }
 
     window.confirmResetApp = async function() {
@@ -2277,48 +2281,29 @@ document.addEventListener('DOMContentLoaded', async function() {
                     const name = entry.entryName || entry.entry;
                     if (name !== '.Trash') {
                         const path = `${DATA_DIR_ROOT}/${name}`;
-                        if (entry.type === 'DIRECTORY') {
-                        } else {
-                            await Neutralino.filesystem.removeFile(path);
-                        }
+                        if (entry.type !== 'DIRECTORY') await Neutralino.filesystem.removeFile(path);
                     }
                 }
-                // 强制退出
                 showToast("数据已清空，即将重启...", "success");
                 setTimeout(() => Neutralino.app.exit(), 1500);
-            } catch (err) {
-                showToast("清空失败: " + err.message, "error");
-            }
+            } catch (err) { showToast("清空失败: " + err.message, "error"); }
         }
     };
 
-        // =========================================
     // 状态栏增强功能
-    // =========================================
-
     let sessionStartTime = Date.now();
     let usageTimer = null;
-
     function updateStatusBar() {
         if (!editor) return;
-        
         const cursor = editor.getCursor();
         const content = editor.getValue();
         const selection = editor.getSelection();
-        
-        // 1. 光标位置
         document.getElementById('stat-cursor').innerText = `行 ${cursor.line + 1}, 列 ${cursor.ch + 1}`;
-        
-        // 2. 字符与字数
         const charCount = content.length;
         const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
         document.getElementById('stat-chars').innerText = `字符: ${charCount}`;
         document.getElementById('stat-words').innerText = `字数: ${wordCount}`;
-        
-        // 3. 选中字符 (始终显示)
         document.getElementById('stat-selected').innerText = `已选中: ${selection.length}`;
-        
-        // 4. 使用时间
         if (!usageTimer) {
             usageTimer = setInterval(() => {
                 const diff = Math.floor((Date.now() - sessionStartTime) / 1000);
@@ -2328,85 +2313,41 @@ document.addEventListener('DOMContentLoaded', async function() {
             }, 1000);
         }
     }
-
-    // 监听编辑器变化以更新状态
     editor.on("change", updateStatusBar);
     editor.on("cursorActivity", updateStatusBar);
-    
-    // 初始化一次
     setTimeout(updateStatusBar, 500);
 
-    // --- 按钮功能实现 ---
-
-    // 1. 隐藏/显示侧边栏
+    // 按钮功能实现
     window.toggleSidebar = function() {
         const sidebar = document.getElementById('sidebar');
-        const resizer = document.querySelector('.resizer'); // 假设你有一个拖拽手柄
-        if (sidebar.style.display === 'none') {
-            sidebar.style.display = 'flex';
-            if (resizer) resizer.style.display = 'block';
-        } else {
-            sidebar.style.display = 'none';
-            if (resizer) resizer.style.display = 'none';
-        }
+        const resizer = document.querySelector('.resizer');
+        if (sidebar.style.display === 'none') { sidebar.style.display = 'flex'; if (resizer) resizer.style.display = 'block'; }
+        else { sidebar.style.display = 'none'; if (resizer) resizer.style.display = 'none'; }
     };
 
-    // 2. 隐藏/显示编辑区 (专注预览模式)
     window.toggleEditor = function() {
         const editorContainer = document.getElementById('editor-container');
         const preview = document.getElementById('preview');
-        if (editorContainer.style.display === 'none') {
-            editorContainer.style.display = 'block';
-            editorContainer.style.width = '50%';
-            preview.style.display = 'block';
-        } else {
-            editorContainer.style.display = 'none';
-            preview.style.width = '100%';
-        }
+        if (editorContainer.style.display === 'none') { editorContainer.style.display = 'block'; editorContainer.style.width = '50%'; preview.style.display = 'block'; }
+        else { editorContainer.style.display = 'none'; preview.style.width = '100%'; }
     };
 
-    // 3. 文章大纲/跳转
     window.openOutlineModal = function() {
-        if (!currentFilePath) {
-            showToast("你要查看空气的章节吗", "info");
-            return;
-        }
-        
+        if (!currentFilePath) { showToast("你要查看空气的章节吗", "info"); return; }
         const content = editor.getValue();
         const headings = [];
         const lines = content.split('\n');
-        
-        // 简单正则提取 # 标题
         lines.forEach((line, index) => {
             const match = line.match(/^(#{1,6})\s+(.*)/);
-            if (match) {
-                headings.push({
-                    level: match[1].length,
-                    text: match[2],
-                    line: index
-                });
-            }
+            if (match) headings.push({ level: match[1].length, text: match[2], line: index });
         });
-
-        if (headings.length === 0) {
-            showToast("此文章无章节，要创建章节，使用“#”", "info");
-            return;
-        }
-
-        // 构建弹窗内容
+        if (headings.length === 0) { showToast("此文章无章节，要创建章节，使用“#”", "info"); return; }
         let html = '<ul style="list-style:none; padding:0; margin:0;">';
         headings.forEach(h => {
             const indent = (h.level - 1) * 15;
-            html += `<li style="padding: 6px 10px ${6}px ${indent + 10}px; cursor:pointer; border-radius:4px; hover:bg-gray-100;" 
-                     onmouseover="this.style.background='rgba(0,0,0,0.05)'" 
-                     onmouseout="this.style.background='transparent'"
-                     onclick="jumpToLine(${h.line}); closeModal(null);">
-                     <span style="color:#888; font-size:11px; margin-right:8px;">H${h.level}</span>
-                     ${h.text}
-                     </li>`;
+            html += `<li style="padding: 6px 10px ${6}px ${indent + 10}px; cursor:pointer; border-radius:4px; hover:bg-gray-100;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='transparent'" onclick="jumpToLine(${h.line}); closeModal(null);"><span style="color:#888; font-size:11px; margin-right:8px;">H${h.level}</span>${h.text}</li>`;
         });
         html += '</ul>';
-
         const modal = document.getElementById('custom-modal');
         document.getElementById('modal-title').innerText = "文章大纲";
         document.getElementById('modal-message').innerHTML = html;
@@ -2423,210 +2364,65 @@ document.addEventListener('DOMContentLoaded', async function() {
         editor.focus();
     };
 
-    window.saveGithubSettings = function() {
-        appSettings.ghToken = document.getElementById('setting-gh-token').value;
-        appSettings.ghOwner = document.getElementById('setting-gh-owner').value;
-        appSettings.ghRepo = document.getElementById('setting-gh-repo').value;
-        appSettings.ghPathTemplate = document.getElementById('setting-gh-path').value || "imgs/{YYYY}-{MM}-{DD}";
-        appSettings.ghBranch = document.getElementById('setting-gh-branch').value || "master";
-        saveSettings();
-        showToast("图床配置已保存", "success");
-    };
-
-    // GitHub 图床上传逻辑
-
-    window.uploadImageToGithub = async function(file) {
-        if (!appSettings.ghToken || !appSettings.ghOwner || !appSettings.ghRepo) {
-            showToast("请先在设置中配置图床", "error");
-            return null;
+    window.testWebDavConnection = async function() {
+        const urlInput = document.getElementById('setting-wd-url');
+        const userInput = document.getElementById('setting-wd-user');
+        const passInput = document.getElementById('setting-wd-pass');
+        
+        const url = urlInput ? urlInput.value.trim() : appSettings.wdUrl;
+        const user = userInput ? userInput.value.trim() : appSettings.wdUser;
+        const pass = passInput ? passInput.value : appSettings.wdPass;
+        
+        if (!url || !user) {
+            showToast("请先填写服务器地址和用户名", "error");
+            return;
         }
 
+        showToast("正在通过原生网络层连接 WebDAV...", "info");
+        
         try {
-            showToast("正在上传图片", "info");
-
-            // 1. 读取文件为 Base64
-            const base64Data = await readFileAsBase64(file);
-            const content = base64Data.split(',')[1]; // 去掉 data:image/png;base64, 前缀
-
-            // 2. 生成远程路径
-            const remotePath = generateRemotePath(file.name);
-
-            // 3. 构造 GitHub API URL
-            // PUT /repos/{owner}/{repo}/contents/{path}
-            const url = `https://api.github.com/repos/${appSettings.ghOwner}/${appSettings.ghRepo}/contents/${remotePath}`;
-            
-            // 4. 发送请求
+            // 使用 Neutralino 原生 API
             const response = await Neutralino.net.fetch(url, {
-                method: 'PUT',
+                method: 'PROPFIND',
                 headers: {
-                    'Authorization': `token ${appSettings.ghToken}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
+                    'Authorization': 'Basic ' + btoa(user + ':' + pass),
+                    'Depth': '1',
+                    'Content-Type': 'application/xml'
                 },
-                body: JSON.stringify({
-                    message: `Upload image: ${file.name}`,
-                    content: content,
-                    branch: appSettings.ghBranch
-                })
+                body: '<?xml version="1.0" encoding="utf-8"?><D:propfind xmlns:D="DAV:"><D:prop><D:displayname/></D:prop></D:propfind>'
             });
 
-            const result = await response.json();
+            console.log("WebDAV Native Status:", response.status);
 
-            if (result.content && result.content.download_url) {
-                showToast("已上传到 Github 仓库", "success");
-                return result.content.download_url;
+            if (response.status === 207 || response.status === 200) {
+                showToast("已与 WebDav 服务器完成链接", "success");
+            } else if (response.status === 401) {
+                showToast("认证失败：请检查用户名或应用密码", "error");
+            } else if (response.status === 404) {
+                showToast("路径错误：服务器未找到该地址", "error");
             } else {
-                console.error(result);
-                showToast("上传终止: " + (result.message || "未知错误"), "error");
-                return null;
+                showToast(`异常状态码: HTTP ${response.status}`, "error");
             }
-
         } catch (err) {
-            console.error(err);
-            showToast("上传终止: " + err.message, "error");
-            return null;
+            console.error("WebDAV Native Error:", err);
+            showToast("网络请求失败: " + err.message, "error");
         }
     };
 
-    // 辅助：读取文件为 Base64
-    function readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // 辅助：生成远程路径
-    function generateRemotePath(fileName) {
-        let path = appSettings.ghPathTemplate;
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const dd = String(now.getDate()).padStart(2, '0');
+    window.backupToWebDav = async function() {
+        saveBindingSettings();
         
-        // 获取当前文档名（不带后缀）
-        let mdName = "unknown";
-        if (currentFilePath) {
-            mdName = currentFilePath.split('/').pop().replace(/\.[^/.]+$/, "");
-        }
-
-        path = path.replace('{YYYY}', yyyy);
-        path = path.replace('{MM}', mm);
-        path = path.replace('{DD}', dd);
-        path = path.replace('{MDNAME}', mdName);
-
-        // 确保路径以 / 结尾如果不是文件名
-        if (!path.endsWith('/')) {
-            path += '/';
-        }
+        showToast("正在与云服务器链接", "info");
         
-        return `${path}${fileName}`;
-    }
+        if (typeof window.syncAllToWebDav === 'function') {
+            await window.syncAllToWebDav();
+        } else {
+            showToast("备份插件未加载", "error");
+        }
+    };
 
-
-    // GitHub 图床上传
-
-    async function uploadImageToGithub(file) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                // 1. 读取文件为 Base64
-                const reader = new FileReader();
-                reader.onload = async () => {
-                    const base64Data = reader.result;
-                    const content = base64Data.split(',')[1]; // 去掉 header
-
-                    // 2. 生成远程路径
-                    const remotePath = generateRemotePath(file.name);
-                    
-                    // 校验 URL 格式
-                    if (appSettings.ghOwner.includes('http') || appSettings.ghRepo.includes('http')) {
-                        reject(new Error("设置错误：仓库名或用户名为纯文本，请勿填写 URL"));
-                        return;
-                    }
-
-                    const url = `https://api.github.com/repos/${appSettings.ghOwner}/${appSettings.ghRepo}/contents/${remotePath}`;
-                    
-                    // 3. 构造 JSON Payload 基础部分
-                    const payloadObj = {
-                        message: `Upload via Mark Editor: ${file.name}`,
-                        content: content,
-                        branch: appSettings.ghBranch
-                    };
-
-                    // 是否已存在以获取 SHA
-                    let existingSha = null;
-                    try {
-                        // 尝试 GET 请求获取文件信息
-                        const checkCmd = `curl -s -H "Authorization: token ${appSettings.ghToken}" -H "Accept: application/vnd.github.v3+json" "${url}"`;
-                        const checkResult = await Neutralino.os.execCommand(checkCmd);
-                        
-                        if (checkResult.exitCode === 0 && checkResult.stdOut) {
-                            const checkJson = JSON.parse(checkResult.stdOut);
-                            if (checkJson.sha) {
-                                existingSha = checkJson.sha;
-                                console.log("已有同名文件，SHA:", existingSha);
-                            }
-                        }
-                    } catch (e) {
-                        console.log("即将与 Github 开始链接");
-                    }
-
-                    // 如果存在 SHA，加入 Payload
-                    if (existingSha) {
-                        payloadObj.sha = existingSha;
-                    }
-
-                    const payloadStr = JSON.stringify(payloadObj);
-
-                    // 5. 将 Payload 写入临时文件
-                    const tempDir = await Neutralino.os.getPath('temp');
-                    const payloadFile = `${tempDir}\\mark_upload_payload.json`;
-                    
-                    try {
-                        await Neutralino.filesystem.writeFile(payloadFile, payloadStr);
-                    } catch (writeErr) {
-                        reject(new Error("无法创建临时文件"));
-                        return;
-                    }
-
-                    console.log("正在通过 curl 上传到:", url);
-
-                    // 6. 构造 curl 命令 (PUT)
-                    const curlCmd = `curl -X PUT "${url}" -H "Authorization: token ${appSettings.ghToken}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" -d @${payloadFile}`;
-
-                    // 7. 执行上传
-                    const result = await Neutralino.os.execCommand(curlCmd);
-                    
-                    // 8. 清理临时文件
-                    try { await Neutralino.filesystem.removeFile(payloadFile); } catch(e){}
-
-                    if (result.exitCode === 0 && result.stdOut) {
-                        try {
-                            const jsonResponse = JSON.parse(result.stdOut);
-                            if (jsonResponse.content && jsonResponse.content.download_url) {
-                                resolve(jsonResponse.content.download_url);
-                            } else {
-                                console.error("API Response:", jsonResponse);
-                                reject(new Error(jsonResponse.message || "上传失败"));
-                            }
-                        } catch (e) {
-                            reject(new Error("解析响应失败"));
-                        }
-                    } else {
-                        reject(new Error("网络请求失败: " + (result.stdErr || result.stdOut)));
-                    }
-                };
-                reader.onerror = () => reject(new Error("文件读取错误"));
-                reader.readAsDataURL(file);
-
-            } catch (err) {
-                reject(err);
-            }
-        });
-    }
-
+    document.body.classList.add('loaded');
+    
     initSystemDir();
 });
 

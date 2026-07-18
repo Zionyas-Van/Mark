@@ -5,10 +5,17 @@
     <title>Mark</title>
     <link rel="stylesheet" href="css/codemirror.min.css">
     <link id="theme-style" rel="stylesheet" href="css/styles.css">
+    <link id="theme-style" rel="stylesheet" href="css/styles.css">
+    <style>
+        body { background-color: #f5f5f5; margin: 0; font-family: "Segoe UI", sans-serif; }
+        #workspace { opacity: 0; transition: opacity 0.2s ease-in; }
+        body.loaded #workspace { opacity: 1; }
+    </style>
+</head>
 </head>
 <body>
     <header id="toolbar">
-        <!-- 左侧区域：固定贴左 -->
+        <!-- 左侧区域 -->
         <div class="toolbar-section toolbar-left">
             <div id="file-menu-btn" class="menu-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
@@ -20,7 +27,7 @@
             </div>
         </div>
 
-        <!-- 中间区域：自动撑开，内容居中 -->
+        <!-- 中间区域 -->
         <div class="toolbar-section toolbar-center">
             <div id="rich-toolbar" class="rich-toolbar">
                 <!-- 撤销 -->
@@ -160,7 +167,6 @@
             <div class="dropdown-item" onclick="setAsDefaultApp()">设为默认打开方式</div>
             <div class="dropdown-item" onclick="openDataFolder()">打开数据文件夹</div>
         </div>
-    </header>
 
     </header>
 
@@ -341,17 +347,17 @@
                 
                 <!-- 左侧导航栏 -->
                 <div style="width: 200px; background: rgba(0,0,0,0.02); border-right: 1px solid var(--winui-border-light); padding: 10px 0; overflow-y: auto;">
-                    <div class="setting-nav-item active" onclick="switchSettingTab('general', this)">
+                    <div class="setting-nav-item active" onclick="switchSettingTab('account', this)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        绑定与数据安全
+                    </div>
+                    <div class="setting-nav-item" onclick="switchSettingTab('general', this)">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         通用设置
                     </div>
                     <div class="setting-nav-item" onclick="switchSettingTab('theme', this)">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
                         个性化
-                    </div>
-                    <div class="setting-nav-item" onclick="switchSettingTab('account', this)">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        账号与数据
                     </div>
                     <div class="setting-nav-item" onclick="switchSettingTab('about', this)">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -383,38 +389,10 @@
                                 </label>
                             </div>
                         </div>
-
-                        <div class="setting-group" style="margin-top: 25px;"></div>
-                        <!-- 图床配置 -->
-                        <div class="setting-group">
-                            <h4>GitHub 图床配置</h4>
-                            <label>修改配置后需要点击“保存图床配置”后再”保存更改“以生效</label>
-                            <div class="setting-group" style="margin-top: 10px;"></div>
-                            <div class="winui-input-group">
-                                <label>Personal Access Token (需 repo 权限)</label>
-                                <input type="password" id="setting-gh-token" class="winui-input" placeholder="ghp_xxxxxxxxxxxx">
-                            </div>
-                            <div class="winui-input-group">
-                                <label>仓库所有者 (User-name)[注意连字符]</label>
-                                <input type="text" id="setting-gh-owner" class="winui-input" placeholder="your-username">
-                            </div>
-                            <div class="winui-input-group">
-                                <label>仓库名称 (Repo-Name)[注意连字符]</label>
-                                <input type="text" id="setting-gh-repo" class="winui-input" placeholder="my-image-host">
-                            </div>
-                            <div class="winui-input-group">
-                                <label>存储路径模板（默认为 imgs/{YYYY}-{MM}-{DD}）</label>
-                                <input type="text" id="setting-gh-path" class="winui-input" value="imgs/{YYYY}-{MM}-{DD}" placeholder="imgs/{YYYY}-{MM}-{DD}/{MDNAME}">
-                            </div>
-                            <div class="winui-input-group">
-                                <label>分支名称</label>
-                                <input type="text" id="setting-gh-branch" class="winui-input" value="master" placeholder="main or master">
-                            </div>
-                            <button class="winui-btn primary" onclick="saveGithubSettings()">保存图床配置</button>
-                        </div>
                     </div>
 
-                    <!-- 2. 个性化面板 -->
+
+                    <!-- 个性化面板 -->
                     <div id="tab-theme" class="setting-tab-content" style="display: none;">
                         <h4 style="margin-bottom: 20px; font-size: 18px;">外观定制</h4>
                         
@@ -437,6 +415,7 @@
                         </div>
                     </div>
 
+                   
                     <!-- 3. 账号与数据面板 -->
                     <div id="tab-account" class="setting-tab-content" style="display: none;">
                         <h4 style="margin-bottom: 20px; font-size: 18px;">本地账户</h4>
@@ -451,26 +430,80 @@
                             </div>
                         </div>
 
-                        <h4 style="margin-bottom: 15px; font-size: 16px; margin-top: 30px;">数据管理</h4>
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                            <button class="winui-btn secondary" onclick="backupSettings()">备份配置</button>
-                            <button class="winui-btn secondary" onclick="restoreSettings()">恢复配置</button>
+                        <!-- GitHub 图床部分 -->
+                        <div style="margin-bottom: 40px;">
+                            <h4 style="margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                GitHub 图床配置
+                            </h4>
+
+                            <div style="margin-bottom: 20px;"></div>
+                            <div style="background: #f0f8ff; color: #005fb8; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;">
+                                在 Github 设置界面找到“开发者选项”，生成 Token 密钥以绑定图床功能，Mark 不会对你的 Github 账号有任何威胁，除非你使用的是经过恶意修改后的版本。
+                            </div>
+                            <div class="winui-input-group">
+                                <label>Personal Access Token（密钥）</label>
+                                <input type="password" id="setting-gh-token" class="winui-input" placeholder="ghp_xxxxxxxxxxxx">
+                            </div>
+                            <div class="winui-input-group">
+                                <label>用户名 (User-name)[注意连字符]</label>
+                                <input type="text" id="setting-gh-owner" class="winui-input" placeholder="例如: zionyas-van">
+                            </div>
+                            <div class="winui-input-group">
+                                <label>仓库名称 (Repo-Name)[你的图片将保存至此仓库，注意连字符]</label>
+                                <input type="text" id="setting-gh-repo" class="winui-input" placeholder="例如: mark-images">
+                            </div>
+                            <div class="winui-input-group">
+                                <label>分支名称</label>
+                                <input type="text" id="setting-gh-branch" class="winui-input" value="main" placeholder="main or master">
+                            </div>
                         </div>
 
-                        <div style="border-top: 1px solid var(--winui-border-light); margin: 20px 0;"></div>
-                        
-                        <h4 style="margin-bottom: 15px; font-size: 16px; color: var(--winui-danger);">危险操作</h4>
-                        <button class="winui-btn secondary" style="color: var(--winui-danger); border-color: var(--winui-danger);" onclick="confirmResetApp()">
-                            注销并清空所有数据
-                        </button>
-                        <p style="font-size: 12px; color: var(--winui-text-secondary); margin-top: 8px;">此操作将删除所以配置以及用户数据，且无法恢复。</p>
-                    </div>
+                        <!-- WebDAV 同步部分 -->
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                                WebDAV 云同步
+                            </h4>
+                            <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;">
+                                在坚果云、Nextcloud 等平台生成“WebDav应用密码”绑定至此。
+                            </div>
+                            <div class="winui-input-group">
+                                <label>服务器地址 (URL)</label>
+                                <input type="text" id="setting-wd-url" class="winui-input" placeholder="https://dav.jianguoyun.com/dav/">
+                            </div>
+                            <div class="winui-input-group">
+                                <label>用户名 / 邮箱</label>
+                                <input type="text" id="setting-wd-user" class="winui-input" placeholder="your@email.com">
+                            </div>
+                            <div class="winui-input-group">
+                                <label>应用密码</label>
+                                <input type="password" id="setting-wd-pass" class="winui-input" placeholder="非登录密码">
+                            </div>
+                            <div class="winui-input-group">
+                                <label>远程同步目录</label>
+                                <input type="text" id="setting-wd-dir" class="winui-input" value="/MarkNotes/" placeholder="/MarkNotes/">
+                            </div>
+
+                            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="winui-btn secondary" onclick="testWebDavConnection()">测试 WebDAV 连接</button>
+                                <button class="winui-btn primary" onclick="backupToWebDav()">立即备份到云端</button>
+                            </div>
+                            
+                            <!-- 保存提示 -->
+                            <div style="margin-top: 15px; padding: 10px; background: #fff8e1; border-left: 4px solid #ffc107; font-size: 13px; color: #856404;">
+                                <strong>提示：</strong> 修改上方 GitHub 或 WebDAV 配置后，请点击右下角的 <b>“保存更改”</b> 按钮，否则配置不会生效！
+                            </div>
+                        </div> 
+                    </div> 
+ 
+
 
                     <!-- 4. 关于面板 -->
                     <div id="tab-about" class="setting-tab-content" style="display: none;">
                         <div style="text-align: center; margin-bottom: 30px;">
                             <h2 style="font-size: 32px; font-weight: 300; letter-spacing: 2px;">Mark</h2>
-                            <p style="color: var(--winui-text-secondary);">Version 1.0.20260717 首发正式版</p>
+                            <p style="color: var(--winui-text-secondary);">Version 1.0.20260718</p>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
@@ -492,7 +525,7 @@
             <!-- 底部操作栏 -->
             <div style="padding: 15px 24px; border-top: 1px solid var(--winui-border-light); background: var(--winui-surface); display: flex; justify-content: flex-end; gap: 10px;">
                 <button class="winui-btn secondary" onclick="closeSettingsModal()">取消</button>
-                <button class="winui-btn primary" onclick="applySettingsFromUI(); closeSettingsModal();">保存更改</button>
+                <button class="winui-btn primary" onclick="saveBindingSettings()">保存更改</button>
             </div>
         </div>
     </div>

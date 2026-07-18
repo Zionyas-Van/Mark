@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
   "applicationId": "com.zionyasvan.mark",
-  "version": "1.0.20260717",
+  "version": "1.0.20260718",
   "defaultMode": "window",
   "port": 0,
   "documentRoot": "/resources/",
@@ -18,8 +18,19 @@
     "os.*",
     "filesystem.*",
     "debug.*",
-    "clipboard.*"
+    "clipboard.*",
+    "net.*"
   ],
+  "security": {
+    "allowCrossDomain": true,
+    "corsWhitelist": [
+      "https://dav.jianguoyun.com",
+      "https://*.jianguoyun.com",
+      "https://api.github.com",
+      "https://*.github.com",
+      "https://raw.githubusercontent.com"
+    ]
+  },
   "globalVariables": {},
   "modes": {
     "window": {
